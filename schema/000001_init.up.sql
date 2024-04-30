@@ -25,8 +25,8 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     price FLOAT NOT NULL,
-    sale_price FLOAT,
-    images_url TEXT,
+    sale_price FLOAT NOT NULL,
+    images_urls TEXT,
     available BOOLEAN NOT NULL,
     stock INT NOT NULL
 );

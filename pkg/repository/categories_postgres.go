@@ -27,9 +27,18 @@ func (r *CategoryPostgres) GetAll() ([]domain.Category, error) {
 func (r *CategoryPostgres) GetById(id int) (domain.Category, error) {
 	var category domain.Category
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", categoriesTables)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", categoriesTables)
 
 	err := r.db.Get(&category, query, id)
 
 	return category, err
+}
+
+func (r *CategoryPostgres) GetProducts(categoryId int) ([]domain.Product, error) {
+	var products []domain.Product
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1", productsTable)
+
+	err := r.db.Select(&products, query, categoryId)
+	return products, err
 }

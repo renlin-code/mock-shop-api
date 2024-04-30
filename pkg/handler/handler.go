@@ -47,16 +47,20 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			categories.GET("/", h.getAllCategories)
 			categories.GET("/:id", h.getCategoryById)
 
-			// products := categories.Group(":id/products")
-			// {
-			// 	products.GET("/", h.getAllProducts)
-			// }
+			products := categories.Group(":id/products")
+			{
+				products.GET("/", h.getCategoryProducts)
+			}
 		}
 
-		// products := api.Group("/products")
-		// {
-		// 	products.GET("/:id", h.getProductById)
-		// }
+		products := api.Group("/products")
+		{
+			products.GET("/", h.getAllProducts)
+		}
+
+		{
+			products.GET("/:id", h.getProductById)
+		}
 	}
 
 	return router

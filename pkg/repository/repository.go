@@ -13,16 +13,24 @@ type Authorization interface {
 type Category interface {
 	GetAll() ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
+	GetProducts(categoryId int) ([]domain.Product, error)
+}
+
+type Product interface {
+	GetAll() ([]domain.Product, error)
+	GetById(id int) (domain.Product, error)
 }
 
 type Repository struct {
 	Authorization
 	Category
+	Product
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: newAuthPostgres(db),
 		Category:      newCategoryPostgres(db),
+		Product:       newProductPostgres(db),
 	}
 }

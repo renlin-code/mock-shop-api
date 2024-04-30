@@ -20,3 +20,7 @@ func (s *CategoryService) GetAll() ([]domain.Category, error) {
 func (s *CategoryService) GetById(id int) (domain.Category, error) {
 	return s.repo.GetById(id)
 }
+
+func (s *CategoryService) GetProducts(categoryId int) ([]domain.Product, error) {
+	return s.repo.GetProducts(categoryId)
+}

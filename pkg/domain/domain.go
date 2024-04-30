@@ -22,13 +22,13 @@ type Order struct {
 }
 
 type Product struct {
-	Id          int
-	CategoryId  int
-	Name        string
-	Description string
-	Price       float32
-	SalePrice   float32
-	ImagesUrl   []string
-	Available   bool
-	Stock       int
+	Id          int     `json:"id" db:"id"`
+	CategoryId  int     `json:"category_id" db:"category_id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float32 `json:"price"`
+	SalePrice   float32 `json:"sale_price" db:"sale_price"`
+	ImagesUrls  string  `json:"images_urls" db:"images_urls"`
+	Available   bool    `json:"available"`
+	Stock       int     `json:"stock"`
 }

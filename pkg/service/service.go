@@ -15,16 +15,23 @@ type Authorization interface {
 type Category interface {
 	GetAll() ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
+	GetProducts(categoryId int) ([]domain.Product, error)
 }
 
+type Product interface {
+	GetAll() ([]domain.Product, error)
+	GetById(id int) (domain.Product, error)
+}
 type Service struct {
 	Authorization
 	Category
+	Product
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Authorization: newAuthService(repos),
-		Category:      newCategoryService(repos),
+		Authorization: newAuthService(repos.Authorization),
+		Category:      newCategoryService(repos.Category),
+		Product:       newProductService(repos.Product),
 	}
 }
