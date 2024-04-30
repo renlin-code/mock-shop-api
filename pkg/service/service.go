@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/renlin-code/mock-shop-api/pkg/domain"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 )
 
@@ -11,12 +12,19 @@ type Authorization interface {
 	ParseAuthToken(token string) (int, error)
 }
 
+type Category interface {
+	GetAll() ([]domain.Category, error)
+	GetById(id int) (domain.Category, error)
+}
+
 type Service struct {
 	Authorization
+	Category
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: newAuthService(repos),
+		Category:      newCategoryService(repos),
 	}
 }

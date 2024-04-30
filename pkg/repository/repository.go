@@ -10,12 +10,19 @@ type Authorization interface {
 	GetUser(email, password string) (domain.User, error)
 }
 
+type Category interface {
+	GetAll() ([]domain.Category, error)
+	GetById(id int) (domain.Category, error)
+}
+
 type Repository struct {
 	Authorization
+	Category
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: newAuthPostgres(db),
+		Category:      newCategoryPostgres(db),
 	}
 }

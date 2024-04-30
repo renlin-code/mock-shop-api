@@ -40,24 +40,24 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	// }
 	// }
 
-	// api := router.Group("/api")
-	// {
-	// 	categories := api.Group("/categories")
-	// 	{
-	// 		categories.GET("/", h.getAllCategories)
-	// 		categories.GET("/:id", h.getCategoryById)
+	api := router.Group("/api")
+	{
+		categories := api.Group("/categories")
+		{
+			categories.GET("/", h.getAllCategories)
+			categories.GET("/:id", h.getCategoryById)
 
-	// 		products := categories.Group(":id/tasks")
-	// 		{
-	// 			products.GET("/", h.getAllProducts)
-	// 		}
-	// 	}
+			// products := categories.Group(":id/products")
+			// {
+			// 	products.GET("/", h.getAllProducts)
+			// }
+		}
 
-	// 	products := api.Group("/products")
-	// 	{
-	// 		products.GET("/:id", h.getProductById)
-	// 	}
-	// }
+		// products := api.Group("/products")
+		// {
+		// 	products.GET("/:id", h.getProductById)
+		// }
+	}
 
 	return router
 }

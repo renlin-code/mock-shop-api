@@ -1,7 +1,7 @@
 package domain
 
 type User struct {
-	Id         int    `json:"id" db:"id"`
+	Id         int    `json:"-" db:"id"`
 	Name       string `json:"name"`
 	Email      string `json:"email"`
 	Password   string `json:"password"`
@@ -9,10 +9,10 @@ type User struct {
 }
 
 type Category struct {
-	Id          int
-	Name        string
-	Description string
-	ImageUrl    string
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageUrl    string `json:"image_url" db:"image_url"`
 }
 
 type Order struct {
