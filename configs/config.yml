@@ -1,0 +1,16 @@
+port: "8020"
+
+db:
+  username: "postgres"
+  host: "localhost"
+  port: "5434"
+  dbname: "postgres"
+  sslmode: "disable"
+
+smtp:
+  server: "smtp.mail.ru"
+  port: "587"
+  sender: "mockshop@mail.ru"
+
+client:
+  confirmation_email_url: "https://client.com/"
