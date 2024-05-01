@@ -7,8 +7,26 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 )
 
-func (h *Handler) userSignUp(c *gin.Context) {
-	var input domain.SignUpInput
+func (h *Handler) getUserProfile(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	user, err := h.services.Profile.GetProfile(userId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) updateUserProfile(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+	var input domain.UpdateProfileInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -18,7 +36,23 @@ func (h *Handler) userSignUp(c *gin.Context) {
 		return
 	}
 
-	err := h.services.UserSignUp(input.Name, input.Email)
+	err = h.services.Profile.UpdateProfile(userId, input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, statusResponse{
+		Status: "ok",
+	})
+}
+
+func (h *Handler) recoveryUserPassword(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+
+	err = h.services.Profile.RecoveryPassword(userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -27,10 +61,11 @@ func (h *Handler) userSignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, statusResponse{
 		Status: "ok",
 	})
+
 }
 
-func (h *Handler) userConfirmEmail(c *gin.Context) {
-	var input domain.ConfirmEmailInput
+func (h *Handler) updateUserPassword(c *gin.Context) {
+	var input domain.UpdatePasswordInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -40,35 +75,12 @@ func (h *Handler) userConfirmEmail(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.CreateUser(input.Token, input.Password)
+	err := h.services.Profile.UpdatePassword(input.Token, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
+	c.JSON(http.StatusOK, statusResponse{
+		Status: "ok",
 	})
-}
-
-func (h *Handler) userSignIn(c *gin.Context) {
-	var input domain.SignInInput
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	if err := validateInput(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	token, err := h.services.Authorization.GenerateAuthToken(input.Email, input.Password)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
-	})
-
 }

@@ -22,10 +22,19 @@ type Product interface {
 	GetAll() ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
 }
+
+type Profile interface {
+	GetProfile(userId int) (domain.User, error)
+	UpdateProfile(userId int, input domain.UpdateProfileInput) error
+	RecoveryPassword(userId int) error
+	UpdatePassword(token, password string) error
+}
+
 type Service struct {
 	Authorization
 	Category
 	Product
+	Profile
 }
 
 func NewService(repos *repository.Repository) *Service {
@@ -33,5 +42,6 @@ func NewService(repos *repository.Repository) *Service {
 		Authorization: newAuthService(repos.Authorization),
 		Category:      newCategoryService(repos.Category),
 		Product:       newProductService(repos.Product),
+		Profile:       newProfileService(repos.Profile),
 	}
 }

@@ -3,14 +3,14 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    profile_image VARCHAR(255)
+    profile_image VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE categories (
     id SERIAL NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL UNIQUE,
-    description VARCHAR(255),
-    image_url VARCHAR(255)
+    description VARCHAR(255) NOT NULL,
+    image_url VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE orders (
@@ -23,10 +23,10 @@ CREATE TABLE products (
     id SERIAL NOT NULL UNIQUE,
     category_id INT REFERENCES categories(id) ON DELETE CASCADE NOT NULL,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
+    description VARCHAR(255) NOT NULL,
     price FLOAT NOT NULL,
     sale_price FLOAT NOT NULL,
-    images_urls TEXT,
+    images_urls TEXT NOT NULL,
     available BOOLEAN NOT NULL,
     stock INT NOT NULL
 );

@@ -4,8 +4,8 @@ type User struct {
 	Id         int    `json:"-" db:"id"`
 	Name       string `json:"name"`
 	Email      string `json:"email"`
-	Password   string `json:"password"`
-	ProfileImg string `json:"profile_image"`
+	Password   string `json:"-"`
+	ProfileImg string `json:"profile_image" db:"profile_image"`
 }
 
 type Category struct {

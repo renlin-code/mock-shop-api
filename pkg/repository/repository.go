@@ -21,10 +21,17 @@ type Product interface {
 	GetById(id int) (domain.Product, error)
 }
 
+type Profile interface {
+	GetProfile(userId int) (domain.User, error)
+	UpdateProfile(userId int, input domain.UpdateProfileInput) error
+	UpdatePassword(userId int, password string) error
+}
+
 type Repository struct {
 	Authorization
 	Category
 	Product
+	Profile
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -32,5 +39,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Authorization: newAuthPostgres(db),
 		Category:      newCategoryPostgres(db),
 		Product:       newProductPostgres(db),
+		Profile:       newProfilePostgres(db),
 	}
 }

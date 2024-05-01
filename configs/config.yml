@@ -13,4 +13,5 @@ smtp:
   sender: "mockshop@mail.ru"
 
 client:
-  confirmation_email_url: "https://client.com/"
+  confirmation_email_url: "https://client.com/confirm-email"
+  password_recovery_url: "https://client.com/password-recovery"

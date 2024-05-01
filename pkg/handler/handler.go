@@ -22,23 +22,25 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/confirm-email", h.userConfirmEmail)
 		auth.POST("/sign-in", h.userSignIn)
 	}
-	// profile := router.Group("/profile", h.userIdentity)
-	// {
-	// 	profile.GET("/", h.getuserProfile)
-	// profile.PUT("/", h.updateuserProfile)
+	profile := router.Group("/profile", h.userIdentity)
+	{
+		profile.GET("/", h.getUserProfile)
+		profile.PUT("/", h.updateUserProfile)
+		profile.GET("/password-recovery", h.recoveryUserPassword)
+		profile.POST("/password-update", h.updateUserPassword)
 
-	// orders := profile.Group("/orders")
-	// {
-	// 	orders.GET("/", h.userGetAllOrder)
-	// 	orders.GET("/:id", h.userGetOrderById)
-	// 	orders.POST("/", h.userCreateOrder)
-	// }
-	// password := profile.Group("/password")
-	// {
-	// 	password.POST("/recovery", h.userRecoveryPassword)
-	// 	password.POST("/change", h.userChangePassword)
-	// }
-	// }
+		// orders := profile.Group("/orders")
+		// {
+		// 	orders.GET("/", h.userGetAllOrder)
+		// 	orders.GET("/:id", h.userGetOrderById)
+		// 	orders.POST("/", h.userCreateOrder)
+		// }
+		// password := profile.Group("/password")
+		// {
+		// 	password.POST("/recovery", h.userRecoveryPassword)
+		// 	password.POST("/change", h.userChangePassword)
+		// }
+	}
 
 	api := router.Group("/api")
 	{

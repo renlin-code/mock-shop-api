@@ -17,7 +17,7 @@ func (ve validationError) Error() string {
 
 var v *validator.Validate = validator.New()
 
-func ValidateInput(data interface{}) error {
+func validateInput(data interface{}) error {
 	var errors []string
 	err := v.Struct(data)
 	if err != nil {
@@ -27,19 +27,4 @@ func ValidateInput(data interface{}) error {
 		return &validationError{errors}
 	}
 	return nil
-}
-
-type signUpInput struct {
-	Name  string `json:"name" validate:"required,max=100"`
-	Email string `json:"email" validate:"required,email"`
-}
-
-type confirmEmailInput struct {
-	Token    string `json:"token" validate:"required"`
-	Password string `json:"password" validate:"required,max=30"`
-}
-
-type signInInput struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,max=30"`
 }
