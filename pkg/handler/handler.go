@@ -29,17 +29,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		profile.GET("/password-recovery", h.recoveryUserPassword)
 		profile.POST("/password-update", h.updateUserPassword)
 
-		// orders := profile.Group("/orders")
-		// {
-		// 	orders.GET("/", h.userGetAllOrder)
-		// 	orders.GET("/:id", h.userGetOrderById)
-		// 	orders.POST("/", h.userCreateOrder)
-		// }
-		// password := profile.Group("/password")
-		// {
-		// 	password.POST("/recovery", h.userRecoveryPassword)
-		// 	password.POST("/change", h.userChangePassword)
-		// }
+		orders := profile.Group("/orders")
+		{
+			orders.POST("/", h.userCreateOrder)
+			orders.GET("/", h.userGetAllOrder)
+			orders.GET("/:id", h.userGetOrderById)
+		}
 	}
 
 	api := router.Group("/api")

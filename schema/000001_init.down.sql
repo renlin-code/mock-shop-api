@@ -1,4 +1,4 @@
-DROP TABLE orders_products;
+DROP TABLE ordered_products;
 
 DROP TABLE products;
 

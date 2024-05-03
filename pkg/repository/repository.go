@@ -25,6 +25,9 @@ type Profile interface {
 	GetProfile(userId int) (domain.User, error)
 	UpdateProfile(userId int, input domain.UpdateProfileInput) error
 	UpdatePassword(userId int, password string) error
+	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
+	GetAllOrders(userId int) ([]domain.Order, error)
+	GetOrderById(userId, orderId int) (domain.Order, error)
 }
 
 type Repository struct {

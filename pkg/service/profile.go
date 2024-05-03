@@ -63,3 +63,15 @@ func (s *ProfileService) UpdatePassword(token, password string) error {
 
 	return s.repo.UpdatePassword(userId, generatePasswordHash(password))
 }
+
+func (s *ProfileService) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
+	return s.repo.CreateOrder(userId, products)
+}
+
+func (s *ProfileService) GetAllOrders(userId int) ([]domain.Order, error) {
+	return s.repo.GetAllOrders(userId)
+}
+
+func (s *ProfileService) GetOrderById(userId, orderId int) (domain.Order, error) {
+	return s.repo.GetOrderById(userId, orderId)
+}

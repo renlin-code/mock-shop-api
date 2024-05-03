@@ -45,11 +45,12 @@ func (s *AuthService) CreateUser(token, password string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	user := new(domain.User)
+	var user domain.User
 	user.Name = tokenPayload["name"].(string)
 	user.Email = tokenPayload["email"].(string)
 	user.Password = generatePasswordHash(password)
-	return s.repo.CreateUser(*user)
+
+	return s.repo.CreateUser(user)
 }
 
 func (s *AuthService) GenerateAuthToken(email, password string) (string, error) {

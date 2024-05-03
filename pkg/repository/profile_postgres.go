@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
@@ -56,7 +58,135 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 func (r *ProfilePostgres) UpdatePassword(userId int, password string) error {
 	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE id=$2", usersTable)
 
-	fmt.Println(query)
 	_, err := r.db.Exec(query, password, userId)
 	return err
+}
+
+func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
+	tx, err := r.db.Begin()
+
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+
+	var orderId int
+	orderDate := time.Now()
+	createOrderQuery := fmt.Sprintf("INSERT INTO %s (user_id, date) VALUES ($1, $2) RETURNING id", ordersTable)
+	row := tx.QueryRow(createOrderQuery, userId, orderDate)
+	if err := row.Scan(&orderId); err != nil {
+		return 0, err
+	}
+
+	var insertValues []string
+	for _, product := range products {
+		updateStockQuery := fmt.Sprintf("UPDATE %s SET stock = stock - $1 WHERE id = $2 RETURNING stock", productsTable)
+		var stock int
+		row := tx.QueryRow(updateStockQuery, product.Quantity, product.Id)
+		if err := row.Scan(&stock); err != nil {
+			return 0, err
+		}
+		if stock < 0 {
+			return 0, errors.New("not enough stock")
+		}
+
+		insertValues = append(insertValues, fmt.Sprintf("(%d, %d, (SELECT name FROM %s WHERE id = %d), (SELECT description FROM %s WHERE id = %d), (SELECT price FROM %s WHERE id = %d), (SELECT sale_price FROM %s WHERE id = %d), (SELECT images_urls FROM %s WHERE id = %d), %d)",
+			orderId, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, product.Quantity))
+	}
+
+	createOrderedProductsQuery := fmt.Sprintf("INSERT INTO %s (order_id, product_id, name, description, price, sale_price, images_urls, quantity) VALUES %s", orderedProductsTable, strings.Join(insertValues, ", "))
+	_, err = tx.Exec(createOrderedProductsQuery)
+	if err != nil {
+		return 0, err
+	}
+
+	return orderId, tx.Commit()
+}
+
+func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
+	query := fmt.Sprintf(`
+		WITH order_products AS (
+			SELECT ot.id AS order_id, ot.user_id, ot.date, opt.id, opt.product_id, opt.name, opt.description, opt.price, opt.sale_price, opt.images_urls, opt.quantity
+			FROM %s ot
+			INNER JOIN %s opt ON opt.order_id = ot.id
+			WHERE ot.user_id = $1
+		),
+		order_total_cost AS (
+			SELECT order_id, SUM(price) AS total_cost
+			FROM order_products
+			GROUP BY order_id
+		)
+		SELECT op.order_id, op.user_id, op.date, op.id, op.product_id, op.name, op.description, op.price, op.sale_price, op.images_urls, op.quantity, otc.total_cost
+		FROM order_products op
+		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
+	`, ordersTable, orderedProductsTable)
+
+	rows, err := r.db.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var ordersMap = make(map[int]domain.Order)
+	var orders []domain.Order
+	for rows.Next() {
+		var order domain.Order
+		var product domain.OrderedProduct
+		err := rows.Scan(&order.Id, &order.UserId, &order.Date, &product.Id, &product.ProductId, &product.Name, &product.Description, &product.Price, &product.SalePrice, &product.ImagesUrls, &product.Quantity, &order.TotalCost)
+		if err != nil {
+			return nil, err
+		}
+		if existingOrder, found := ordersMap[order.Id]; found {
+			existingOrder.Products = append(existingOrder.Products, product)
+			ordersMap[order.Id] = existingOrder
+		} else {
+			order.Products = append(order.Products, product)
+			ordersMap[order.Id] = order
+		}
+	}
+	for _, order := range ordersMap {
+		orders = append(orders, order)
+	}
+	return orders, nil
+}
+
+func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error) {
+	query := fmt.Sprintf(`
+		WITH order_products AS (
+			SELECT ot.id AS order_id, ot.user_id, ot.date, opt.id, opt.product_id, opt.name, opt.description, opt.price, opt.sale_price, opt.images_urls, opt.quantity
+			FROM %s ot
+			INNER JOIN %s opt ON opt.order_id = ot.id
+			WHERE ot.id = $1 AND ot.user_id = $2
+		),
+		order_total_cost AS (
+			SELECT order_id, SUM(price) AS total_cost
+			FROM order_products
+			GROUP BY order_id
+		)
+		SELECT op.order_id, op.user_id, op.date, op.id, op.product_id, op.name, op.description, op.price, op.sale_price, op.images_urls, op.quantity, otc.total_cost
+		FROM order_products op
+		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
+	`, ordersTable, orderedProductsTable)
+
+	var order domain.Order
+
+	rows, err := r.db.Query(query, orderId, userId)
+	if err != nil {
+		return order, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var product domain.OrderedProduct
+		err := rows.Scan(&order.Id, &order.UserId, &order.Date, &product.Id, &product.ProductId, &product.Name, &product.Description, &product.Price, &product.SalePrice, &product.ImagesUrls, &product.Quantity, &order.TotalCost)
+		if err != nil {
+			return order, err
+		}
+		product.OrderId = orderId
+		order.Products = append(order.Products, product)
+	}
+	if order.Id == 0 {
+		return order, errors.New("no rows")
+	}
+	return order, nil
 }
