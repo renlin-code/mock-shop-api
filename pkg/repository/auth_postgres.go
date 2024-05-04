@@ -33,3 +33,11 @@ func (r *AuthPostgres) GetUser(email, password string) (domain.User, error) {
 
 	return user, err
 }
+
+func (r *AuthPostgres) GetUserByEmail(email string) (domain.User, error) {
+	var user domain.User
+	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
+	err := r.db.Get(&user, query, email)
+
+	return user, err
+}

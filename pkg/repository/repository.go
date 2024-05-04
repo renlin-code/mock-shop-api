@@ -8,6 +8,7 @@ import (
 type Authorization interface {
 	CreateUser(user domain.User) (int, error)
 	GetUser(email, password string) (domain.User, error)
+	GetUserByEmail(email string) (domain.User, error)
 }
 
 type Category interface {

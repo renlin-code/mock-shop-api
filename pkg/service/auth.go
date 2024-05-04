@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -18,6 +19,11 @@ func newAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) UserSignUp(name, email string) error {
+	user, _ := s.repo.GetUserByEmail(email)
+	if user.Id != 0 {
+		return errors.New("this email is already registered")
+	}
+
 	tokenPayload := map[string]interface{}{
 		"name":  name,
 		"email": email,
