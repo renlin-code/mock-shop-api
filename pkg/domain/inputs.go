@@ -1,20 +1,53 @@
 package domain
 
-import "sort"
+import (
+	"sort"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+)
+
+const (
+	nameMinLength     = 2
+	nameMaxLength     = 10
+	passwordMinLength = 4
+	passwordMaxLength = 12
+)
 
 type SignUpInput struct {
-	Name  string `json:"name" validate:"required,max=100"`
-	Email string `json:"email" validate:"required,email"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func (i SignUpInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Name, validation.Required, validation.Length(nameMinLength, nameMaxLength)),
+		validation.Field(&i.Email, validation.Required, is.Email),
+	)
 }
 
 type ConfirmEmailInput struct {
-	Token    string `json:"token" validate:"required"`
-	Password string `json:"password" validate:"required,max=30"`
+	Token    string `json:"token"`
+	Password string `json:"password"`
+}
+
+func (i ConfirmEmailInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Token, validation.Required),
+		validation.Field(&i.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
+	)
 }
 
 type SignInInput struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,max=30"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (i SignInInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Email, validation.Required, is.Email),
+		validation.Field(&i.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
+	)
 }
 
 type UpdateProfileInput struct {
@@ -22,18 +55,51 @@ type UpdateProfileInput struct {
 	ProfileImg *string `json:"profile_image"`
 }
 
+func (i UpdateProfileInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Name, validation.Length(nameMinLength, nameMaxLength)),
+		validation.Field(&i.ProfileImg),
+	)
+}
+
 type UpdatePasswordInput struct {
-	Token    string `json:"token" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Token    string `json:"token"`
+	Password string `json:"password"`
+}
+
+func (i UpdatePasswordInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Token, validation.Required),
+		validation.Field(&i.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
+	)
 }
 
 type CreateOrderInputProduct struct {
-	Id       int `json:"id" validate:"required"`
-	Quantity int `json:"quantity" validate:"required"`
+	Id       int `json:"id"`
+	Quantity int `json:"quantity"`
 }
 
 type CreateOrderInput struct {
-	Products []CreateOrderInputProduct `json:"products" validate:"required"`
+	Products []CreateOrderInputProduct `json:"products"`
+}
+
+func (i CreateOrderInput) Validate() error {
+	err := validation.ValidateStruct(&i,
+		validation.Field(&i.Products, validation.Required),
+	)
+	if err != nil {
+		return err
+	}
+	for _, product := range i.Products {
+		err := validation.ValidateStruct(&product,
+			validation.Field(&product.Id, validation.Required, validation.Min(1)),
+			validation.Field(&product.Quantity, validation.Required, validation.Min(1)),
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 type ById []CreateOrderInputProduct

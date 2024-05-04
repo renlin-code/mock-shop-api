@@ -32,7 +32,7 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := validateInput(&input); err != nil {
+	if err := input.Validate(); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -71,7 +71,7 @@ func (h *Handler) updateUserPassword(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := validateInput(&input); err != nil {
+	if err := input.Validate(); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -96,7 +96,7 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := validateInput(&input); err != nil {
+	if err := input.Validate(); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
