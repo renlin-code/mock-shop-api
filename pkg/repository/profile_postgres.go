@@ -20,7 +20,12 @@ func newProfilePostgres(db *sqlx.DB) *ProfilePostgres {
 
 func (r *ProfilePostgres) GetProfile(userId int) (domain.User, error) {
 	var user domain.User
-	query := fmt.Sprintf("SELECT id, name, email, profile_image FROM %s WHERE id=$1", usersTable)
+	query := fmt.Sprintf(`SELECT 
+		id, 
+		name, 
+		email, 
+		profile_image 
+	FROM %s WHERE id=$1`, usersTable)
 	err := r.db.Get(&user, query, userId)
 
 	return user, err
@@ -72,51 +77,113 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 
 	var orderId int
 	orderDate := time.Now()
-	createOrderQuery := fmt.Sprintf("INSERT INTO %s (user_id, date) VALUES ($1, $2) RETURNING id", ordersTable)
+	createOrderQuery := fmt.Sprintf(`INSERT INTO %s (
+		user_id, 
+		date
+	) VALUES ($1, $2) RETURNING id`, ordersTable)
 	row := tx.QueryRow(createOrderQuery, userId, orderDate)
 	if err := row.Scan(&orderId); err != nil {
 		return 0, err
 	}
+	createOrderedProductsQuery := fmt.Sprintf(`INSERT INTO %s (
+		order_id, 
+		product_id, 
+		name, 
+		description, 
+		price, 
+		undiscounted_price, 
+		images_urls, 
+		quantity
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, orderedProductsTable)
 
-	var insertValues []string
-	for _, product := range products {
-		updateStockQuery := fmt.Sprintf("UPDATE %s SET stock = stock - $1 WHERE id = $2 RETURNING stock", productsTable)
-		var stock int
-		row := tx.QueryRow(updateStockQuery, product.Quantity, product.Id)
-		if err := row.Scan(&stock); err != nil {
-			return 0, err
-		}
-		if stock < 0 {
-			return 0, errors.New("not enough stock")
-		}
-
-		insertValues = append(insertValues, fmt.Sprintf("(%d, %d, (SELECT name FROM %s WHERE id = %d), (SELECT description FROM %s WHERE id = %d), (SELECT price FROM %s WHERE id = %d), (SELECT sale_price FROM %s WHERE id = %d), (SELECT images_urls FROM %s WHERE id = %d), %d)",
-			orderId, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, productsTable, product.Id, product.Quantity))
-	}
-
-	createOrderedProductsQuery := fmt.Sprintf("INSERT INTO %s (order_id, product_id, name, description, price, sale_price, images_urls, quantity) VALUES %s", orderedProductsTable, strings.Join(insertValues, ", "))
-	_, err = tx.Exec(createOrderedProductsQuery)
+	stmt, err := tx.Prepare(createOrderedProductsQuery)
 	if err != nil {
 		return 0, err
 	}
+	defer stmt.Close()
 
+	for _, product := range products {
+		updateStockQuery := fmt.Sprintf(`UPDATE %s SET stock = stock - $1 WHERE id = $2 RETURNING 
+			name, 
+			description, 
+			price, 
+			undiscounted_price, 
+			images_urls, 
+			stock
+		`, productsTable)
+		var productFromTable domain.Product
+
+		row := tx.QueryRow(updateStockQuery, product.Quantity, product.Id)
+		err := row.Scan(
+			&productFromTable.Name,
+			&productFromTable.Description,
+			&productFromTable.Price,
+			&productFromTable.UndiscountedPrice,
+			&productFromTable.ImagesUrls,
+			&productFromTable.Stock)
+
+		if err != nil {
+			return 0, err
+		}
+		if productFromTable.Stock < 0 {
+			return 0, errors.New("not enough stock")
+		}
+
+		_, err = stmt.Exec(
+			orderId,
+			product.Id,
+			productFromTable.Name,
+			productFromTable.Description,
+			productFromTable.Price,
+			productFromTable.UndiscountedPrice,
+			productFromTable.ImagesUrls,
+			product.Quantity)
+		if err != nil {
+			return 0, err
+		}
+	}
 	return orderId, tx.Commit()
 }
 
 func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 	query := fmt.Sprintf(`
 		WITH order_products AS (
-			SELECT ot.id AS order_id, ot.user_id, ot.date, opt.id, opt.product_id, opt.name, opt.description, opt.price, opt.sale_price, opt.images_urls, opt.quantity
+			SELECT 
+				ot.id AS order_id, 
+				ot.user_id, 
+				ot.date, 
+				opt.id, 
+				opt.product_id, 
+				opt.name, 
+				opt.description, 
+				opt.price, 
+				opt.undiscounted_price, 
+				opt.images_urls, 
+				opt.quantity
 			FROM %s ot
 			INNER JOIN %s opt ON opt.order_id = ot.id
 			WHERE ot.user_id = $1
 		),
 		order_total_cost AS (
-			SELECT order_id, SUM(price) AS total_cost
+			SELECT 
+				order_id, 
+				SUM(price) AS total_cost
 			FROM order_products
 			GROUP BY order_id
 		)
-		SELECT op.order_id, op.user_id, op.date, op.id, op.product_id, op.name, op.description, op.price, op.sale_price, op.images_urls, op.quantity, otc.total_cost
+		SELECT 
+			op.order_id, 
+			op.user_id, 
+			op.date, 
+			op.id, 
+			op.product_id,
+			op.name, 
+			op.description, 
+			op.price, 
+			op.undiscounted_price, 
+			op.images_urls, 
+			op.quantity, 
+			otc.total_cost
 		FROM order_products op
 		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
 	`, ordersTable, orderedProductsTable)
@@ -132,7 +199,19 @@ func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 	for rows.Next() {
 		var order domain.Order
 		var product domain.OrderedProduct
-		err := rows.Scan(&order.Id, &order.UserId, &order.Date, &product.Id, &product.ProductId, &product.Name, &product.Description, &product.Price, &product.SalePrice, &product.ImagesUrls, &product.Quantity, &order.TotalCost)
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.Date,
+			&product.Id,
+			&product.ProductId,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.UndiscountedPrice,
+			&product.ImagesUrls,
+			&product.Quantity,
+			&order.TotalCost)
 		if err != nil {
 			return nil, err
 		}
@@ -153,7 +232,18 @@ func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error) {
 	query := fmt.Sprintf(`
 		WITH order_products AS (
-			SELECT ot.id AS order_id, ot.user_id, ot.date, opt.id, opt.product_id, opt.name, opt.description, opt.price, opt.sale_price, opt.images_urls, opt.quantity
+			SELECT 
+				ot.id AS order_id, 
+				ot.user_id, 
+				ot.date, 
+				opt.id, 
+				opt.product_id, 
+				opt.name, 
+				opt.description, 
+				opt.price, 
+				opt.undiscounted_price, 
+				opt.images_urls, 
+				opt.quantity
 			FROM %s ot
 			INNER JOIN %s opt ON opt.order_id = ot.id
 			WHERE ot.id = $1 AND ot.user_id = $2
@@ -163,7 +253,19 @@ func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error
 			FROM order_products
 			GROUP BY order_id
 		)
-		SELECT op.order_id, op.user_id, op.date, op.id, op.product_id, op.name, op.description, op.price, op.sale_price, op.images_urls, op.quantity, otc.total_cost
+		SELECT 
+			op.order_id, 
+			op.user_id, 
+			op.date, 
+			op.id, 
+			op.product_id, 
+			op.name, 
+			op.description, 
+			op.price, 
+			op.undiscounted_price, 
+			op.images_urls, 
+			op.quantity, 
+			otc.total_cost
 		FROM order_products op
 		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
 	`, ordersTable, orderedProductsTable)
@@ -178,7 +280,19 @@ func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error
 
 	for rows.Next() {
 		var product domain.OrderedProduct
-		err := rows.Scan(&order.Id, &order.UserId, &order.Date, &product.Id, &product.ProductId, &product.Name, &product.Description, &product.Price, &product.SalePrice, &product.ImagesUrls, &product.Quantity, &order.TotalCost)
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.Date,
+			&product.Id,
+			&product.ProductId,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.UndiscountedPrice,
+			&product.ImagesUrls,
+			&product.Quantity,
+			&order.TotalCost)
 		if err != nil {
 			return order, err
 		}
