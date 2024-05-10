@@ -17,21 +17,21 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
 
 	if header == "" {
-		newErrorResponse(c, http.StatusUnauthorized, "no authorization header provided")
+		Fail(c, "no authorization header provided", http.StatusUnauthorized)
 		return
 	}
 
 	headerParts := strings.Split(header, " ")
 
 	if len(headerParts) != 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid authorization header")
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
 		return
 	}
 
 	userId, err := h.services.Authorization.ParseAuthToken(headerParts[1])
 
 	if err != nil {
-		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		Fail(c, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
@@ -41,13 +41,13 @@ func (h *Handler) userIdentity(c *gin.Context) {
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "user not found")
+		Fail(c, "user not found", http.StatusNotFound)
 		return 0, errors.New("user id not found")
 	}
 
 	idInt, ok := id.(int)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "invalid type for id")
+		Fail(c, "invalid type for id", http.StatusBadRequest)
 		return 0, errors.New("user id not found")
 	}
 

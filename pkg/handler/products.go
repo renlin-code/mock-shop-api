@@ -10,25 +10,24 @@ import (
 func (h *Handler) getAllProducts(c *gin.Context) {
 	categories, err := h.services.Product.GetAll()
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	c.JSON(http.StatusOK, categories)
+	Response(c, categories)
 }
 
 func (h *Handler) getProductById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		Fail(c, "invalid id param", http.StatusBadRequest)
 		return
 	}
 
 	category, err := h.services.Product.GetById(id)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, category)
+	Response(c, category)
 }

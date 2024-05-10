@@ -16,10 +16,10 @@ func (h *Handler) getUserProfile(c *gin.Context) {
 
 	user, err := h.services.Profile.GetProfile(userId)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	Response(c, user)
 }
 
 func (h *Handler) updateUserProfile(c *gin.Context) {
@@ -29,22 +29,20 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	}
 	var input domain.UpdateProfileInput
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	err = h.services.Profile.UpdateProfile(userId, input)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, statusResponse{
-		Status: "ok",
-	})
+	OK(c)
 }
 
 func (h *Handler) recoveryUserPassword(c *gin.Context) {
@@ -55,35 +53,30 @@ func (h *Handler) recoveryUserPassword(c *gin.Context) {
 
 	err = h.services.Profile.RecoveryPassword(userId)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, statusResponse{
-		Status: "ok",
-	})
-
+	OK(c)
 }
 
 func (h *Handler) updateUserPassword(c *gin.Context) {
 	var input domain.UpdatePasswordInput
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	err := h.services.Profile.UpdatePassword(input.Token, input.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, statusResponse{
-		Status: "ok",
-	})
+	OK(c)
 }
 
 func (h *Handler) userCreateOrder(c *gin.Context) {
@@ -93,23 +86,21 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 	}
 	var input domain.CreateOrderInput
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 	input.Sort()
 	id, err := h.services.Profile.CreateOrder(userId, input.Products)
 
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	OKId(c, id)
 }
 
 func (h *Handler) userGetAllOrder(c *gin.Context) {
@@ -120,10 +111,10 @@ func (h *Handler) userGetAllOrder(c *gin.Context) {
 	orders, err := h.services.Profile.GetAllOrders(userId)
 
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, orders)
+	Response(c, orders)
 }
 
 func (h *Handler) userGetOrderById(c *gin.Context) {
@@ -133,15 +124,15 @@ func (h *Handler) userGetOrderById(c *gin.Context) {
 	}
 	orderId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+		Fail(c, "invalid id param", http.StatusBadRequest)
 		return
 	}
 
 	order, err := h.services.Profile.GetOrderById(userId, orderId)
 
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		Fail(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, order)
+	Response(c, order)
 }
