@@ -1,10 +1,10 @@
 package service
 
 import (
-	"errors"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 )
 
 const confirmationTokenTTL = time.Hour
@@ -33,5 +33,5 @@ func parseToken(tokenString, signKey string) (map[string]interface{}, error) {
 		return payload, nil
 	}
 
-	return nil, errors.New("invalid token")
+	return nil, errors_handler.Forbidden("invalid token")
 }

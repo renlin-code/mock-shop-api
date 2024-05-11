@@ -10,6 +10,8 @@ type Authorization interface {
 	CreateUser(token, password string) (int, error)
 	GenerateAuthToken(email, password string) (string, error)
 	ParseAuthToken(token string) (int, error)
+	RecoveryPassword(email string) error
+	UpdatePassword(token, password string) error
 }
 
 type Category interface {
@@ -26,8 +28,6 @@ type Product interface {
 type Profile interface {
 	GetProfile(userId int) (domain.User, error)
 	UpdateProfile(userId int, input domain.UpdateProfileInput) error
-	RecoveryPassword(userId int) error
-	UpdatePassword(token, password string) error
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
 	GetAllOrders(userId int) ([]domain.Order, error)
 	GetOrderById(userId, orderId int) (domain.Order, error)

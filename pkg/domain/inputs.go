@@ -62,6 +62,16 @@ func (i UpdateProfileInput) Validate() error {
 	)
 }
 
+type RecoveryPasswordInput struct {
+	Email string `json:"email"`
+}
+
+func (i RecoveryPasswordInput) Validate() error {
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Email, validation.Required, is.Email),
+	)
+}
+
 type UpdatePasswordInput struct {
 	Token    string `json:"token"`
 	Password string `json:"password"`

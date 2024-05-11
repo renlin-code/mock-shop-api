@@ -45,40 +45,6 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	OK(c)
 }
 
-func (h *Handler) recoveryUserPassword(c *gin.Context) {
-	userId, err := getUserId(c)
-	if err != nil {
-		return
-	}
-
-	err = h.services.Profile.RecoveryPassword(userId)
-	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	OK(c)
-}
-
-func (h *Handler) updateUserPassword(c *gin.Context) {
-	var input domain.UpdatePasswordInput
-	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := input.Validate(); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err := h.services.Profile.UpdatePassword(input.Token, input.Password)
-	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	OK(c)
-}
-
 func (h *Handler) userCreateOrder(c *gin.Context) {
 	userId, err := getUserId(c)
 	if err != nil {

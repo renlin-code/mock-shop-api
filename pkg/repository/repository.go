@@ -9,6 +9,7 @@ type Authorization interface {
 	CreateUser(user domain.User) (int, error)
 	GetUser(email, password string) (domain.User, error)
 	GetUserByEmail(email string) (domain.User, error)
+	UpdatePassword(userId int, password string) error
 }
 
 type Category interface {
@@ -25,7 +26,6 @@ type Product interface {
 type Profile interface {
 	GetProfile(userId int) (domain.User, error)
 	UpdateProfile(userId int, input domain.UpdateProfileInput) error
-	UpdatePassword(userId int, password string) error
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
 	GetAllOrders(userId int) ([]domain.Order, error)
 	GetOrderById(userId, orderId int) (domain.Order, error)

@@ -20,7 +20,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 
 	err := h.services.UserSignUp(input.Name, input.Email)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (h *Handler) userConfirmEmail(c *gin.Context) {
 
 	id, err := h.services.CreateUser(input.Token, input.Password)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
@@ -60,9 +60,49 @@ func (h *Handler) userSignIn(c *gin.Context) {
 
 	token, err := h.services.Authorization.GenerateAuthToken(input.Email, input.Password)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
 	OKToken(c, token)
+}
+
+func (h *Handler) recoveryUserPassword(c *gin.Context) {
+	var input domain.RecoveryPasswordInput
+	if err := c.BindJSON(&input); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := input.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err := h.services.Authorization.RecoveryPassword(input.Email)
+	if err != nil {
+		AbortWithAppErr(c, err)
+		return
+	}
+
+	OK(c)
+}
+
+func (h *Handler) updateUserPassword(c *gin.Context) {
+	var input domain.UpdatePasswordInput
+	if err := c.BindJSON(&input); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := input.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err := h.services.Authorization.UpdatePassword(input.Token, input.Password)
+	if err != nil {
+		Fail(c, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	OK(c)
 }

@@ -21,13 +21,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.userSignUp)
 		auth.POST("/confirm-email", h.userConfirmEmail)
 		auth.POST("/sign-in", h.userSignIn)
+		auth.POST("/password-recovery", h.recoveryUserPassword)
+		auth.POST("/password-update", h.updateUserPassword)
 	}
 	profile := router.Group("/profile", h.userIdentity)
 	{
 		profile.GET("/", h.getUserProfile)
 		profile.PUT("/", h.updateUserProfile)
-		profile.GET("/password-recovery", h.recoveryUserPassword)
-		profile.POST("/password-update", h.updateUserPassword)
 
 		orders := profile.Group("/orders")
 		{

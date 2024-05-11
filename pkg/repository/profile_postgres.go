@@ -60,13 +60,6 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 	return nil
 }
 
-func (r *ProfilePostgres) UpdatePassword(userId int, password string) error {
-	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE id=$2", usersTable)
-
-	_, err := r.db.Exec(query, password, userId)
-	return err
-}
-
 func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
 	tx, err := r.db.Begin()
 
