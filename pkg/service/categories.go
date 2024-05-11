@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
+	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 )
 
@@ -14,13 +15,25 @@ func newCategoryService(repo repository.Category) *CategoryService {
 }
 
 func (s *CategoryService) GetAll() ([]domain.Category, error) {
-	return s.repo.GetAll()
+	categories, err := s.repo.GetAll()
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return categories, errors_handler.NotFound("categories")
+	}
+	return categories, err
 }
 
 func (s *CategoryService) GetById(id int) (domain.Category, error) {
-	return s.repo.GetById(id)
+	category, err := s.repo.GetById(id)
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return category, errors_handler.NotFound("category")
+	}
+	return category, err
 }
 
 func (s *CategoryService) GetProducts(categoryId int) ([]domain.Product, error) {
-	return s.repo.GetProducts(categoryId)
+	products, err := s.repo.GetProducts(categoryId)
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return products, errors_handler.NotFound("products")
+	}
+	return products, err
 }

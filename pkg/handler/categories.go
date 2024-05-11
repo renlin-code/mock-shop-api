@@ -10,7 +10,7 @@ import (
 func (h *Handler) getAllCategories(c *gin.Context) {
 	categories, err := h.services.Category.GetAll()
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
@@ -26,7 +26,7 @@ func (h *Handler) getCategoryById(c *gin.Context) {
 
 	category, err := h.services.Category.GetById(id)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
@@ -42,7 +42,7 @@ func (h *Handler) getCategoryProducts(c *gin.Context) {
 
 	products, err := h.services.Category.GetProducts(catId)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		AbortWithAppErr(c, err)
 		return
 	}
 
