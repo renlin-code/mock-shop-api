@@ -16,7 +16,7 @@ func (h *Handler) getUserProfile(c *gin.Context) {
 
 	user, err := h.services.Profile.GetProfile(userId)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 	Response(c, user)
@@ -29,7 +29,7 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	}
 	var input domain.UpdateProfileInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -39,7 +39,7 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 
 	err = h.services.Profile.UpdateProfile(userId, input)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 	OK(c)
@@ -52,7 +52,7 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 	}
 	var input domain.CreateOrderInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -63,7 +63,7 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 	id, err := h.services.Profile.CreateOrder(userId, input.Products)
 
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 	OKId(c, id)
@@ -77,7 +77,7 @@ func (h *Handler) userGetAllOrder(c *gin.Context) {
 	orders, err := h.services.Profile.GetAllOrders(userId)
 
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 	Response(c, orders)
@@ -90,14 +90,14 @@ func (h *Handler) userGetOrderById(c *gin.Context) {
 	}
 	orderId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		Fail(c, "invalid id param", http.StatusBadRequest)
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
 		return
 	}
 
 	order, err := h.services.Profile.GetOrderById(userId, orderId)
 
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 	Response(c, order)

@@ -19,6 +19,8 @@ const (
 	TypeNoRows Type = "no_rows"
 	// TypeAlreadyExists is used for DB errors when is violated unique constrain.
 	TypeAlreadyExists Type = "already_exists"
+	// TypeConstrainViolation is used for DB errors when is violated a standard constrain.
+	TypeConstrainViolation Type = "constrain_violation"
 )
 
 // AppError is an implementation of error with types to
@@ -83,10 +85,18 @@ func NoRows() error {
 	}
 }
 
-// NoRows returns an AppError with a TypeNoRows type.
+// AlreadyExists returns an AppError with a TypeAlreadyExists type.
 func AlreadyExists(entity string) error {
 	return &AppError{
 		text:    entity + " already exists",
 		errType: TypeAlreadyExists,
+	}
+}
+
+// ConstrainViolation returns an AppError with a TypeConstrainViolation type.
+func ConstrainViolation(constrainName string) error {
+	return &AppError{
+		text:    constrainName + " constrain violated",
+		errType: TypeConstrainViolation,
 	}
 }

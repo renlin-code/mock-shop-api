@@ -20,7 +20,7 @@ func (h *Handler) getAllCategories(c *gin.Context) {
 func (h *Handler) getCategoryById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		Fail(c, "invalid id param", http.StatusBadRequest)
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *Handler) getCategoryById(c *gin.Context) {
 func (h *Handler) getCategoryProducts(c *gin.Context) {
 	catId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		Fail(c, "invalid id param", http.StatusBadRequest)
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
 		return
 	}
 

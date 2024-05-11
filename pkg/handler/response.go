@@ -79,3 +79,8 @@ func errTypeStatusCode(errType errors_handler.Type) int {
 		return http.StatusBadRequest
 	}
 }
+
+const (
+	bindErrorText      = "invalid request body"
+	invalidIdErrorText = "invalid id param"
+)

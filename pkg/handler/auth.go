@@ -10,7 +10,7 @@ import (
 func (h *Handler) userSignUp(c *gin.Context) {
 	var input domain.SignUpInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -30,7 +30,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 func (h *Handler) userConfirmEmail(c *gin.Context) {
 	var input domain.ConfirmEmailInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -50,7 +50,7 @@ func (h *Handler) userConfirmEmail(c *gin.Context) {
 func (h *Handler) userSignIn(c *gin.Context) {
 	var input domain.SignInInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -70,7 +70,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 func (h *Handler) recoveryUserPassword(c *gin.Context) {
 	var input domain.RecoveryPasswordInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *Handler) recoveryUserPassword(c *gin.Context) {
 func (h *Handler) updateUserPassword(c *gin.Context) {
 	var input domain.UpdatePasswordInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, err.Error(), http.StatusBadRequest)
+		Fail(c, bindErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {

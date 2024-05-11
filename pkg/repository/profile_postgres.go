@@ -1,13 +1,15 @@
 package repository
 
 import (
-	"errors"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
+	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 )
 
 type ProfilePostgres struct {
@@ -27,6 +29,9 @@ func (r *ProfilePostgres) GetProfile(userId int) (domain.User, error) {
 		profile_image 
 	FROM %s WHERE id=$1`, usersTable)
 	err := r.db.Get(&user, query, userId)
+	if err == sql.ErrNoRows {
+		return user, errors_handler.NoRows()
+	}
 
 	return user, err
 }
@@ -55,6 +60,10 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 
 	_, err := r.db.Exec(query, args...)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors_handler.NoRows()
+		}
+
 		return err
 	}
 	return nil
@@ -116,12 +125,11 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 			&productFromTable.Stock)
 
 		if err != nil {
+			if pqErr, ok := err.(*pq.Error); ok && strings.Contains(pqErr.Message, "violates check constraint \"stock\"") {
+				return 0, errors_handler.ConstrainViolation("stock")
+			}
 			return 0, err
 		}
-		if productFromTable.Stock < 0 {
-			return 0, errors.New("not enough stock")
-		}
-
 		_, err = stmt.Exec(
 			orderId,
 			product.Id,
@@ -179,6 +187,7 @@ func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 			otc.total_cost
 		FROM order_products op
 		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
+		ORDER BY id
 	`, ordersTable, orderedProductsTable)
 
 	rows, err := r.db.Query(query, userId)
@@ -293,7 +302,7 @@ func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error
 		order.Products = append(order.Products, product)
 	}
 	if order.Id == 0 {
-		return order, errors.New("no rows")
+		return order, errors_handler.NoRows()
 	}
 	return order, nil
 }

@@ -20,7 +20,7 @@ func (h *Handler) getAllProducts(c *gin.Context) {
 func (h *Handler) getProductById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		Fail(c, "invalid id param", http.StatusBadRequest)
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
 		return
 	}
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
+	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 )
 
@@ -22,7 +23,12 @@ func (s *ProfileService) UpdateProfile(userId int, input domain.UpdateProfileInp
 }
 
 func (s *ProfileService) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
-	return s.repo.CreateOrder(userId, products)
+	id, err := s.repo.CreateOrder(userId, products)
+	if errors_handler.ErrorIsType(err, errors_handler.TypeConstrainViolation) {
+		return id, errors_handler.BadRequest("quantity exceeds the stock")
+	}
+	return id, err
+
 }
 
 func (s *ProfileService) GetAllOrders(userId int) ([]domain.Order, error) {
@@ -30,5 +36,9 @@ func (s *ProfileService) GetAllOrders(userId int) ([]domain.Order, error) {
 }
 
 func (s *ProfileService) GetOrderById(userId, orderId int) (domain.Order, error) {
-	return s.repo.GetOrderById(userId, orderId)
+	order, err := s.repo.GetOrderById(userId, orderId)
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return order, errors_handler.NotFound("order")
+	}
+	return order, err
 }

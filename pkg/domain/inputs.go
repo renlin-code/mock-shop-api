@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"sort"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -84,13 +85,12 @@ func (i UpdatePasswordInput) Validate() error {
 	)
 }
 
+type CreateOrderInput struct {
+	Products []CreateOrderInputProduct `json:"products"`
+}
 type CreateOrderInputProduct struct {
 	Id       int `json:"id"`
 	Quantity int `json:"quantity"`
-}
-
-type CreateOrderInput struct {
-	Products []CreateOrderInputProduct `json:"products"`
 }
 
 func (i CreateOrderInput) Validate() error {
@@ -100,7 +100,13 @@ func (i CreateOrderInput) Validate() error {
 	if err != nil {
 		return err
 	}
+	uniqueIDs := make(map[int]struct{})
+
 	for _, product := range i.Products {
+		if _, found := uniqueIDs[product.Id]; found {
+			return errors.New("product id must to be unique")
+		}
+		uniqueIDs[product.Id] = struct{}{}
 		err := validation.ValidateStruct(&product,
 			validation.Field(&product.Id, validation.Required, validation.Min(1)),
 			validation.Field(&product.Quantity, validation.Required, validation.Min(1)),
