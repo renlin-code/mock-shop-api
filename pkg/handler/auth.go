@@ -20,7 +20,7 @@ func (h *Handler) userSignUp(c *gin.Context) {
 
 	err := h.services.UserSignUp(input.Name, input.Email)
 	if err != nil {
-		AbortWithAppErr(c, err)
+		FailAndHandleErr(c, err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (h *Handler) userConfirmEmail(c *gin.Context) {
 
 	id, err := h.services.CreateUser(input.Token, input.Password)
 	if err != nil {
-		AbortWithAppErr(c, err)
+		FailAndHandleErr(c, err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (h *Handler) userSignIn(c *gin.Context) {
 
 	token, err := h.services.Authorization.GenerateAuthToken(input.Email, input.Password)
 	if err != nil {
-		AbortWithAppErr(c, err)
+		FailAndHandleErr(c, err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (h *Handler) recoveryUserPassword(c *gin.Context) {
 
 	err := h.services.Authorization.RecoveryPassword(input.Email)
 	if err != nil {
-		AbortWithAppErr(c, err)
+		FailAndHandleErr(c, err)
 		return
 	}
 

@@ -10,9 +10,10 @@ import (
 func (h *Handler) getAllProducts(c *gin.Context) {
 	categories, err := h.services.Product.GetAll()
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
+
 	Response(c, categories)
 }
 
@@ -25,7 +26,7 @@ func (h *Handler) getProductById(c *gin.Context) {
 
 	category, err := h.services.Product.GetById(id)
 	if err != nil {
-		Fail(c, err.Error(), http.StatusInternalServerError)
+		FailAndHandleErr(c, err)
 		return
 	}
 

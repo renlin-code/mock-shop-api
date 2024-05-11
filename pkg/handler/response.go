@@ -52,11 +52,11 @@ func Fail(c *gin.Context, message string, statusCode int) {
 	c.AbortWithStatusJSON(statusCode, newResponse(false, message, nil))
 }
 
-// Fail send a failed response with appError.
-func AbortWithAppErr(c *gin.Context, err error) {
+// FailAndHandleErr send a failed response and handle the error.
+func FailAndHandleErr(c *gin.Context, err error) {
 	appError := new(errors_handler.AppError)
 	if errors.As(err, &appError) { // client error
-		c.AbortWithStatusJSON(errTypeStatusCode(appError.Type()), newResponse(false, err.Error(), nil))
+		Fail(c, err.Error(), errTypeStatusCode(appError.Type()))
 		return
 	}
 
