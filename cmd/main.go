@@ -12,6 +12,7 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 	"github.com/renlin-code/mock-shop-api/pkg/service"
+	"github.com/renlin-code/mock-shop-api/pkg/storage"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -37,7 +38,11 @@ func main() {
 		logrus.Fatalf("Failed to initialize database: %s", err.Error())
 	}
 
-	repos := repository.NewRepository(db)
+	fsStorage := storage.NewFileSystemStorage(storage.Config{
+		BaseUrl: viper.GetString("server.base_url"),
+	})
+	storage := storage.NewStorage(fsStorage)
+	repos := repository.NewRepository(db, storage)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"mime/multipart"
+
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
@@ -18,8 +20,8 @@ func (s *ProfileService) GetProfile(userId int) (domain.User, error) {
 	return s.repo.GetProfile(userId)
 }
 
-func (s *ProfileService) UpdateProfile(userId int, input domain.UpdateProfileInput) error {
-	return s.repo.UpdateProfile(userId, input)
+func (s *ProfileService) UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error {
+	return s.repo.UpdateProfile(userId, input, file)
 }
 
 func (s *ProfileService) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {

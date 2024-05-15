@@ -1,8 +1,11 @@
 package repository
 
 import (
+	"mime/multipart"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
+	"github.com/renlin-code/mock-shop-api/pkg/storage"
 )
 
 type Authorization interface {
@@ -25,7 +28,7 @@ type Product interface {
 
 type Profile interface {
 	GetProfile(userId int) (domain.User, error)
-	UpdateProfile(userId int, input domain.UpdateProfileInput) error
+	UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
 	GetAllOrders(userId int) ([]domain.Order, error)
 	GetOrderById(userId, orderId int) (domain.Order, error)
@@ -38,11 +41,11 @@ type Repository struct {
 	Profile
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
+func NewRepository(db *sqlx.DB, s *storage.Storage) *Repository {
 	return &Repository{
 		Authorization: newAuthPostgres(db),
 		Category:      newCategoryPostgres(db),
 		Product:       newProductPostgres(db),
-		Profile:       newProfilePostgres(db),
+		Profile:       newProfilePostgres(db, s),
 	}
 }

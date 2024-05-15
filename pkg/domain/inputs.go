@@ -2,7 +2,10 @@ package domain
 
 import (
 	"errors"
+	"fmt"
+	"mime/multipart"
 	"sort"
+	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -52,14 +55,21 @@ func (i SignInInput) Validate() error {
 }
 
 type UpdateProfileInput struct {
-	Name       *string `json:"name"`
-	ProfileImg *string `json:"profile_image"`
+	Name           *string               `json:"name"`
+	ProfileImgFile *multipart.FileHeader `json:"profile_image_file"`
 }
 
 func (i UpdateProfileInput) Validate() error {
+	const maxFileSize = 10 << 20 //10 MB
+	allowedExtensions := [3]string{"jpg", "jpeg", "png"}
+	if i.Name == nil && i.ProfileImgFile == nil {
+		return errors.New("no name and/or profile image file provided")
+	}
+	if i.ProfileImgFile.Size > 0 {
+		return validateFile(i.ProfileImgFile, maxFileSize, allowedExtensions[:])
+	}
 	return validation.ValidateStruct(&i,
 		validation.Field(&i.Name, validation.Length(nameMinLength, nameMaxLength)),
-		validation.Field(&i.ProfileImg),
 	)
 }
 
@@ -104,7 +114,7 @@ func (i CreateOrderInput) Validate() error {
 
 	for _, product := range i.Products {
 		if _, found := uniqueIDs[product.Id]; found {
-			return errors.New("product id must to be unique")
+			return errors.New("product id must be unique")
 		}
 		uniqueIDs[product.Id] = struct{}{}
 		err := validation.ValidateStruct(&product,
@@ -126,4 +136,22 @@ func (a ById) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (i *CreateOrderInput) Sort() {
 	sort.Sort(ById(i.Products))
+}
+
+func validateFile(file *multipart.FileHeader, maxSize int64, allowedExtensions []string) error {
+	if file.Size > maxSize {
+		return fmt.Errorf("file size exceeds max size (%d)", maxSize)
+	}
+	ext := strings.ToLower(strings.Split(file.Filename, ".")[1])
+	validExtension := false
+	for _, allowedExt := range allowedExtensions {
+		if ext == allowedExt {
+			validExtension = true
+			break
+		}
+	}
+	if !validExtension {
+		return fmt.Errorf("file extension must be .%s", strings.Join(allowedExtensions, "/."))
+	}
+	return nil
 }

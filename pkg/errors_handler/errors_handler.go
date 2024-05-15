@@ -21,6 +21,9 @@ const (
 	TypeAlreadyExists Type = "already_exists"
 	// TypeConstrainViolation is used for DB errors when is violated a standard constrain.
 	TypeConstrainViolation Type = "constrain_violation"
+
+	// TypeStorageError is used for storage errors when there is an error creating file.
+	TypeStorageError Type = "storage_error"
 )
 
 // AppError is an implementation of error with types to
@@ -98,5 +101,13 @@ func ConstrainViolation(constrainName string) error {
 	return &AppError{
 		text:    constrainName + " constrain violated",
 		errType: TypeConstrainViolation,
+	}
+}
+
+// StorageError returns an AppError with a TypeStorageError type.
+func StorageError(text string) error {
+	return &AppError{
+		text:    text,
+		errType: TypeStorageError,
 	}
 }

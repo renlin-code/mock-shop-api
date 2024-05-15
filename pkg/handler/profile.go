@@ -27,17 +27,26 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	var input domain.UpdateProfileInput
-	if err := c.BindJSON(&input); err != nil {
-		Fail(c, bindErrorText, http.StatusBadRequest)
+
+	r := c.Request
+	name := r.FormValue("name")
+	file, handler, err := r.FormFile("profile_image_file")
+	if err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+	defer file.Close()
+
+	var input domain.UpdateProfileInput
+	input.Name = &name
+	input.ProfileImgFile = handler
+
 	if err := input.Validate(); err != nil {
 		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = h.services.Profile.UpdateProfile(userId, input)
+	err = h.services.Profile.UpdateProfile(userId, input, file)
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return

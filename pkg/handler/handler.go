@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/renlin-code/mock-shop-api/pkg/service"
 )
@@ -15,6 +16,11 @@ func NewHandler(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"}
+	config.AllowMethods = []string{"GET", "PUT", "POST", "DELETE"}
+	config.AllowHeaders = []string{"Authorization"}
+	router.Use(cors.New(config))
 
 	auth := router.Group("/auth")
 	{

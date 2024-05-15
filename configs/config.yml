@@ -15,3 +15,6 @@ smtp:
 client:
   confirmation_email_url: "https://client.com/confirm-email"
   password_recovery_url: "https://client.com/password-recovery"
+
+server:
+  base_url: "https://backend-base-url.com"

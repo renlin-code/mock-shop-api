@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"mime/multipart"
 	"strings"
 	"time"
 
@@ -10,14 +11,16 @@ import (
 	"github.com/lib/pq"
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
+	"github.com/renlin-code/mock-shop-api/pkg/storage"
 )
 
 type ProfilePostgres struct {
 	db *sqlx.DB
+	s  *storage.Storage
 }
 
-func newProfilePostgres(db *sqlx.DB) *ProfilePostgres {
-	return &ProfilePostgres{db}
+func newProfilePostgres(db *sqlx.DB, s *storage.Storage) *ProfilePostgres {
+	return &ProfilePostgres{db, s}
 }
 
 func (r *ProfilePostgres) GetProfile(userId int) (domain.User, error) {
@@ -36,7 +39,13 @@ func (r *ProfilePostgres) GetProfile(userId int) (domain.User, error) {
 	return user, err
 }
 
-func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileInput) error {
+func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1
@@ -47,9 +56,15 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 		argId++
 	}
 
-	if input.ProfileImg != nil {
+	if input.ProfileImgFile != nil {
+		url, err := r.s.UploadProfileImage(userId, input.ProfileImgFile, file)
+
+		if err != nil {
+			return err
+		}
+
 		setValues = append(setValues, fmt.Sprintf("profile_image=$%d", argId))
-		args = append(args, *input.ProfileImg)
+		args = append(args, url)
 		argId++
 	}
 
@@ -58,7 +73,7 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", usersTable, setQuery, argId)
 	args = append(args, userId)
 
-	_, err := r.db.Exec(query, args...)
+	_, err = tx.Exec(query, args...)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors_handler.NoRows()
@@ -66,7 +81,8 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 
 		return err
 	}
-	return nil
+
+	return tx.Commit()
 }
 
 func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
