@@ -10,6 +10,7 @@ CREATE TABLE categories (
     id SERIAL NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL UNIQUE,
     description VARCHAR(255) NOT NULL,
+    available BOOLEAN NOT NULL,
     image_url VARCHAR(255) NOT NULL
 );
 

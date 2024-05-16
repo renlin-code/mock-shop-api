@@ -20,7 +20,7 @@ func newProductPostgres(db *sqlx.DB) *ProductPostgres {
 func (r *ProductPostgres) GetAll() ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id", productsTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id", productsTable)
 
 	err := r.db.Select(&products, query)
 	if err == sql.ErrNoRows {
@@ -33,7 +33,7 @@ func (r *ProductPostgres) GetAll() ([]domain.Product, error) {
 func (r *ProductPostgres) GetById(id int) (domain.Product, error) {
 	var product domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1", productsTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id=$1 AND available=true", productsTable)
 
 	err := r.db.Get(&product, query, id)
 	if err == sql.ErrNoRows {

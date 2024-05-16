@@ -20,6 +20,8 @@ type Category interface {
 	GetAll() ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
 	GetProducts(categoryId int) ([]domain.Product, error)
+	CreateCategory(input domain.CreateCategoryInput, file multipart.File) (int, error)
+	UpdateCategory(id int, input domain.UpdateCategoryInput, file multipart.File) error
 }
 
 type Product interface {

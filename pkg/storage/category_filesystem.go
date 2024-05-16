@@ -9,28 +9,28 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 )
 
-type ProfileFileSystem struct {
+type CategoryFileSystem struct {
 	FileSystem *FileSystemStorage
 }
 
-func newProfileFileSystem(fs *FileSystemStorage) *ProfileFileSystem {
-	return &ProfileFileSystem{FileSystem: fs}
+func newCategoryFileSystem(fs *FileSystemStorage) *CategoryFileSystem {
+	return &CategoryFileSystem{FileSystem: fs}
 }
 
-func (s *ProfileFileSystem) UploadProfileImage(userId int, handler *multipart.FileHeader, file multipart.File) (string, error) {
-	userDir := fmt.Sprintf("/data/users/%d/", userId)
+func (s *CategoryFileSystem) UploadCategoryImage(categoryId int, handler *multipart.FileHeader, file multipart.File) (string, error) {
+	categoryDir := fmt.Sprintf("/data/categories/%d/", categoryId)
 
-	err := os.RemoveAll("." + userDir)
+	err := os.RemoveAll("." + categoryDir)
 	if err != nil {
 		return "", errors_handler.StorageError("error deleting directory")
 	}
 
-	err = os.MkdirAll("."+userDir, os.ModePerm)
+	err = os.MkdirAll("."+categoryDir, os.ModePerm)
 	if err != nil {
 		return "", errors_handler.StorageError("error creating directory")
 	}
 
-	path := userDir + handler.Filename
+	path := categoryDir + handler.Filename
 	f, err := os.Create("." + path)
 	if err != nil {
 		return "", errors_handler.StorageError("error creating file")

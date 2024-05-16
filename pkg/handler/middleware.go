@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,11 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	headerParts := strings.Split(header, " ")
 
 	if len(headerParts) != 2 {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	if headerParts[0] != "Bearer" {
 		Fail(c, "invalid authorization header", http.StatusUnauthorized)
 		return
 	}
@@ -52,4 +58,32 @@ func getUserId(c *gin.Context) (int, error) {
 	}
 
 	return idInt, nil
+}
+
+func (h *Handler) adminIdentity(c *gin.Context) {
+	header := c.GetHeader(authorizationHeader)
+
+	if header == "" {
+		Fail(c, "no authorization header provided", http.StatusUnauthorized)
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+
+	if len(headerParts) != 2 {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	if headerParts[0] != "Bearer" {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	adminSecret := os.Getenv("ADMIN_SECRET")
+
+	if headerParts[1] != adminSecret {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
 }

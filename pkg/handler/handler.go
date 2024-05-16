@@ -66,5 +66,19 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 	}
 
+	admin := router.Group("/admin", h.adminIdentity)
+	{
+		categories := admin.Group("/categories")
+		{
+			categories.POST("/", h.adminCreateCategory)
+			categories.PUT("/:id", h.adminUpdateCategory)
+		}
+		// products := admin.Group("/products")
+		// {
+		// 	products.POST("/", h.adminCreateProduct)
+		// 	products.PUT("/:id", h.adminUpdateProduct)
+		// }
+	}
+
 	return router
 }

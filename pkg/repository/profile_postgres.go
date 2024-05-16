@@ -56,7 +56,7 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 		argId++
 	}
 
-	if input.ProfileImgFile != nil {
+	if input.ProfileImgFile != nil && file != nil {
 		url, err := r.s.UploadProfileImage(userId, input.ProfileImgFile, file)
 
 		if err != nil {
@@ -70,10 +70,11 @@ func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileIn
 
 	setQuery := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", usersTable, setQuery, argId)
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d RETURNING id", usersTable, setQuery, argId)
 	args = append(args, userId)
 
-	_, err = tx.Exec(query, args...)
+	var id int
+	err = tx.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors_handler.NoRows()

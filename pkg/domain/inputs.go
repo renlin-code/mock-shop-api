@@ -12,11 +12,21 @@ import (
 )
 
 const (
-	nameMinLength     = 2
-	nameMaxLength     = 10
+	userNameMinLength = 2
+	userNameMaxLength = 10
+
 	passwordMinLength = 4
 	passwordMaxLength = 12
+
+	categoryNameMinLength        = 2
+	categoryNameMaxLength        = 15
+	categoryDescriptionMinLength = 0
+	categoryDescriptionMaxLength = 200
+
+	maxFileSize = 10 << 20 //10 MB
 )
+
+var allowedFileExtensions = [3]string{"jpg", "jpeg", "png"}
 
 type SignUpInput struct {
 	Name  string `json:"name"`
@@ -25,7 +35,7 @@ type SignUpInput struct {
 
 func (i SignUpInput) Validate() error {
 	return validation.ValidateStruct(&i,
-		validation.Field(&i.Name, validation.Required, validation.Length(nameMinLength, nameMaxLength)),
+		validation.Field(&i.Name, validation.Required, validation.Length(userNameMinLength, userNameMaxLength)),
 		validation.Field(&i.Email, validation.Required, is.Email),
 	)
 }
@@ -60,16 +70,14 @@ type UpdateProfileInput struct {
 }
 
 func (i UpdateProfileInput) Validate() error {
-	const maxFileSize = 10 << 20 //10 MB
-	allowedExtensions := [3]string{"jpg", "jpeg", "png"}
 	if i.Name == nil && i.ProfileImgFile == nil {
-		return errors.New("no name and/or profile image file provided")
+		return errors.New("no name/profile_image_file provided")
 	}
-	if i.ProfileImgFile.Size > 0 {
-		return validateFile(i.ProfileImgFile, maxFileSize, allowedExtensions[:])
+	if i.ProfileImgFile != nil {
+		return validateFile(i.ProfileImgFile, maxFileSize, allowedFileExtensions[:])
 	}
 	return validation.ValidateStruct(&i,
-		validation.Field(&i.Name, validation.Length(nameMinLength, nameMaxLength)),
+		validation.Field(&i.Name, validation.Length(userNameMinLength, userNameMaxLength)),
 	)
 }
 
@@ -140,7 +148,7 @@ func (i *CreateOrderInput) Sort() {
 
 func validateFile(file *multipart.FileHeader, maxSize int64, allowedExtensions []string) error {
 	if file.Size > maxSize {
-		return fmt.Errorf("file size exceeds max size (%d)", maxSize)
+		return fmt.Errorf("file size exceeds max size (%d bytes)", maxSize)
 	}
 	ext := strings.ToLower(strings.Split(file.Filename, ".")[1])
 	validExtension := false
@@ -152,6 +160,58 @@ func validateFile(file *multipart.FileHeader, maxSize int64, allowedExtensions [
 	}
 	if !validExtension {
 		return fmt.Errorf("file extension must be .%s", strings.Join(allowedExtensions, "/."))
+	}
+	return nil
+}
+
+type CreateCategoryInput struct {
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	ImgFile     *multipart.FileHeader `json:"image_file"`
+	Available   bool                  `json:"available"`
+}
+
+func (i CreateCategoryInput) Validate() error {
+	err := validation.ValidateStruct(&i,
+		validation.Field(&i.Name, validation.Required, validation.Length(categoryNameMinLength, categoryNameMaxLength)),
+		validation.Field(&i.Description, validation.Length(categoryDescriptionMinLength, categoryDescriptionMaxLength)),
+	)
+	if err != nil {
+		return err
+	}
+
+	if i.ImgFile == nil || i.ImgFile.Size == 0 {
+		return errors.New("image_file: cannot be blank")
+	}
+
+	err = validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type UpdateCategoryInput struct {
+	Name        *string               `json:"name"`
+	Description *string               `json:"description"`
+	ImgFile     *multipart.FileHeader `json:"image_file"`
+	Available   *bool                 `json:"available"`
+}
+
+func (i UpdateCategoryInput) Validate() error {
+	if i.Name == nil && i.Description == nil && i.ImgFile == nil && i.Available == nil {
+		return errors.New("no name/description/image_file/available provided")
+	}
+	if i.ImgFile != nil {
+		return validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
+	}
+
+	err := validation.ValidateStruct(&i,
+		validation.Field(&i.Name, validation.Length(categoryNameMinLength, categoryNameMaxLength)),
+		validation.Field(&i.Description, validation.Length(categoryDescriptionMinLength, categoryDescriptionMaxLength)),
+	)
+	if err != nil {
+		return err
 	}
 	return nil
 }
