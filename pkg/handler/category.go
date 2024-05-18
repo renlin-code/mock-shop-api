@@ -61,7 +61,11 @@ func (h *Handler) adminCreateCategory(c *gin.Context) {
 
 	file, handler, err := r.FormFile("image_file")
 	if err != nil {
-		Fail(c, "image_file: cannot be blank", http.StatusBadRequest)
+		if err == http.ErrMissingFile {
+			Fail(c, "image_file: can not be blank", http.StatusBadRequest)
+			return
+		}
+		FailAndHandleErr(c, err)
 		return
 	}
 	defer file.Close()
@@ -92,9 +96,18 @@ func (h *Handler) adminUpdateCategory(c *gin.Context) {
 	var input domain.UpdateCategoryInput
 
 	name := r.FormValue("name")
+	if name != "" {
+		input.Name = &name
+	}
+
 	description := r.FormValue("description")
-	availableValue := r.FormValue("available")
-	available := availableValue != "false"
+	if description != "" {
+		input.Description = &description
+	}
+
+	availableField := r.FormValue("available")
+	available := availableField != "false"
+	input.Available = &available
 
 	file, handler, err := r.FormFile("image_file")
 	if err != nil {
@@ -105,9 +118,7 @@ func (h *Handler) adminUpdateCategory(c *gin.Context) {
 	} else {
 		defer file.Close()
 	}
-	input.Name = &name
-	input.Description = &description
-	input.Available = &available
+
 	input.ImgFile = handler
 
 	if err := input.Validate(); err != nil {

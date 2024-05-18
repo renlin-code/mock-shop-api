@@ -26,6 +26,8 @@ type Category interface {
 type Product interface {
 	GetAll() ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
+	CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error)
+	UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error
 }
 
 type Profile interface {
@@ -47,7 +49,7 @@ func NewRepository(db *sqlx.DB, s *storage.Storage) *Repository {
 	return &Repository{
 		Authorization: newAuthPostgres(db),
 		Category:      newCategoryPostgres(db, s),
-		Product:       newProductPostgres(db),
+		Product:       newProductPostgres(db, s),
 		Profile:       newProfilePostgres(db, s),
 	}
 }

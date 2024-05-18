@@ -27,6 +27,8 @@ type Category interface {
 type Product interface {
 	GetAll() ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
+	CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error)
+	UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error
 }
 
 type Profile interface {

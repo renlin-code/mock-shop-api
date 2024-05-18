@@ -19,6 +19,8 @@ const (
 	TypeNoRows Type = "no_rows"
 	// TypeAlreadyExists is used for DB errors when is violated unique constrain.
 	TypeAlreadyExists Type = "already_exists"
+	// TypeForeignKeyViolation is used for DB errors when is violated a foreign key.
+	TypeForeignKeyViolation Type = "foreign_key_violation"
 	// TypeConstrainViolation is used for DB errors when is violated a standard constrain.
 	TypeConstrainViolation Type = "constrain_violation"
 
@@ -93,6 +95,14 @@ func AlreadyExists(entity string) error {
 	return &AppError{
 		text:    entity + " already exists",
 		errType: TypeAlreadyExists,
+	}
+}
+
+// ForeingKeyViolation returns an AppError with a TypeForeignKeyViolation type.
+func ForeignKeyViolation() error {
+	return &AppError{
+		text:    "foreign key violated",
+		errType: TypeForeignKeyViolation,
 	}
 }
 

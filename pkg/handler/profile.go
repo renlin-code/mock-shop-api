@@ -32,6 +32,10 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	var input domain.UpdateProfileInput
 
 	name := r.FormValue("name")
+	if name != "" {
+		input.Name = &name
+	}
+
 	file, handler, err := r.FormFile("profile_image_file")
 	if err != nil {
 		if err != http.ErrMissingFile {

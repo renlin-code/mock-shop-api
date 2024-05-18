@@ -138,7 +138,7 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 			&productFromTable.Description,
 			&productFromTable.Price,
 			&productFromTable.UndiscountedPrice,
-			&productFromTable.ImagesUrls,
+			&productFromTable.ImageUrl,
 			&productFromTable.Stock)
 
 		if err != nil {
@@ -154,7 +154,7 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 			productFromTable.Description,
 			productFromTable.Price,
 			productFromTable.UndiscountedPrice,
-			productFromTable.ImagesUrls,
+			productFromTable.ImageUrl,
 			product.Quantity)
 		if err != nil {
 			return 0, err
@@ -228,7 +228,7 @@ func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 			&product.Description,
 			&product.Price,
 			&product.UndiscountedPrice,
-			&product.ImagesUrls,
+			&product.ImageUrl,
 			&product.Quantity,
 			&order.TotalCost)
 		if err != nil {
@@ -309,7 +309,7 @@ func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error
 			&product.Description,
 			&product.Price,
 			&product.UndiscountedPrice,
-			&product.ImagesUrls,
+			&product.ImageUrl,
 			&product.Quantity,
 			&order.TotalCost)
 		if err != nil {

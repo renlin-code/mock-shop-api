@@ -18,12 +18,17 @@ const (
 	passwordMinLength = 4
 	passwordMaxLength = 12
 
+	maxFileSize = 10 << 20 //10 MB
+
 	categoryNameMinLength        = 2
 	categoryNameMaxLength        = 15
 	categoryDescriptionMinLength = 0
 	categoryDescriptionMaxLength = 200
 
-	maxFileSize = 10 << 20 //10 MB
+	productNameMinLength        = 2
+	productNameMaxLength        = 100
+	productDescriptionMinLength = 0
+	productDescriptionMaxLength = 200
 )
 
 var allowedFileExtensions = [3]string{"jpg", "jpeg", "png"}
@@ -71,7 +76,7 @@ type UpdateProfileInput struct {
 
 func (i UpdateProfileInput) Validate() error {
 	if i.Name == nil && i.ProfileImgFile == nil {
-		return errors.New("no name/profile_image_file provided")
+		return errors.New("no fields provided")
 	}
 	if i.ProfileImgFile != nil {
 		return validateFile(i.ProfileImgFile, maxFileSize, allowedFileExtensions[:])
@@ -181,7 +186,7 @@ func (i CreateCategoryInput) Validate() error {
 	}
 
 	if i.ImgFile == nil || i.ImgFile.Size == 0 {
-		return errors.New("image_file: cannot be blank")
+		return errors.New("image_file: can not be blank")
 	}
 
 	err = validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
@@ -200,7 +205,7 @@ type UpdateCategoryInput struct {
 
 func (i UpdateCategoryInput) Validate() error {
 	if i.Name == nil && i.Description == nil && i.ImgFile == nil && i.Available == nil {
-		return errors.New("no name/description/image_file/available provided")
+		return errors.New("no fields provided")
 	}
 	if i.ImgFile != nil {
 		return validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
@@ -209,6 +214,80 @@ func (i UpdateCategoryInput) Validate() error {
 	err := validation.ValidateStruct(&i,
 		validation.Field(&i.Name, validation.Length(categoryNameMinLength, categoryNameMaxLength)),
 		validation.Field(&i.Description, validation.Length(categoryDescriptionMinLength, categoryDescriptionMaxLength)),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type CreateProductInput struct {
+	CategoryId        int                   `json:"category_id"`
+	Name              string                `json:"name"`
+	Description       string                `json:"description"`
+	ImgFile           *multipart.FileHeader `json:"image_file"`
+	Available         bool                  `json:"available"`
+	Price             float32               `json:"price"`
+	UndiscountedPrice float32               `json:"undiscounted_price"`
+	Stock             int                   `json:"stock"`
+}
+
+func (i CreateProductInput) Validate() error {
+	err := validation.ValidateStruct(&i,
+		validation.Field(&i.CategoryId, validation.Required, validation.Min(1)),
+		validation.Field(&i.Name, validation.Required, validation.Length(productNameMinLength, productNameMaxLength)),
+		validation.Field(&i.Description, validation.Length(productDescriptionMinLength, productDescriptionMaxLength)),
+		validation.Field(&i.Price, validation.Required, validation.Min(0.0)),
+		validation.Field(&i.UndiscountedPrice, validation.Required, validation.Min(0.0)),
+		validation.Field(&i.Stock, validation.Required, validation.Min(0)),
+	)
+	if err != nil {
+		return err
+	}
+
+	if i.ImgFile == nil || i.ImgFile.Size == 0 {
+		return errors.New("image_file: can not be blank")
+	}
+
+	err = validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+type UpdateProductInput struct {
+	CategoryId        *int                  `json:"category_id"`
+	Name              *string               `json:"name"`
+	Description       *string               `json:"description"`
+	ImgFile           *multipart.FileHeader `json:"image_file"`
+	Available         *bool                 `json:"available"`
+	Price             *float32              `json:"price"`
+	UndiscountedPrice *float32              `json:"undiscounted_price"`
+	Stock             *int                  `json:"stock"`
+}
+
+func (i UpdateProductInput) Validate() error {
+	if i.CategoryId == nil &&
+		i.Name == nil &&
+		i.Description == nil &&
+		i.ImgFile == nil &&
+		i.Available == nil &&
+		i.Price == nil &&
+		i.UndiscountedPrice == nil &&
+		i.Stock == nil {
+		return errors.New("no fields provided")
+	}
+	if i.ImgFile != nil {
+		return validateFile(i.ImgFile, maxFileSize, allowedFileExtensions[:])
+	}
+	err := validation.ValidateStruct(&i,
+		validation.Field(&i.CategoryId, validation.Min(1)),
+		validation.Field(&i.Name, validation.Length(productNameMinLength, productNameMaxLength)),
+		validation.Field(&i.Description, validation.Length(productDescriptionMinLength, productDescriptionMaxLength)),
+		validation.Field(&i.Price, validation.Min(0.0)),
+		validation.Field(&i.UndiscountedPrice, validation.Min(0.0)),
+		validation.Field(&i.Stock, validation.Min(0)),
 	)
 	if err != nil {
 		return err

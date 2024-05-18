@@ -25,9 +25,9 @@ CREATE TABLE products (
     category_id INT REFERENCES categories(id) ON DELETE CASCADE NOT NULL,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    price FLOAT NOT NULL CHECK (price >= 0),
-    undiscounted_price FLOAT NOT NULL CHECK (undiscounted_price >= price),
-    images_urls TEXT NOT NULL,
+    price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
+    undiscounted_price NUMERIC(12, 2) NOT NULL CHECK (undiscounted_price >= price),
+    image_url VARCHAR(255) NOT NULL,
     available BOOLEAN NOT NULL,
     stock INT NOT NULL CHECK (stock >= 0)
 );
@@ -38,8 +38,8 @@ CREATE TABLE ordered_products (
     product_id INT REFERENCES products(id) ON DELETE CASCADE NOT NULL,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    price FLOAT NOT NULL  CHECK (price >= 0),
-    undiscounted_price FLOAT NOT NULL  CHECK (undiscounted_price >= price),
+    price NUMERIC(12, 2) NOT NULL  CHECK (price >= 0),
+    undiscounted_price NUMERIC(12, 2) NOT NULL  CHECK (undiscounted_price >= price),
     images_urls TEXT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0)
 );

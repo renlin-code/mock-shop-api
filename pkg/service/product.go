@@ -1,6 +1,8 @@
 package service
 
 import (
+	"mime/multipart"
+
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
@@ -28,4 +30,22 @@ func (s *ProductService) GetById(id int) (domain.Product, error) {
 		return product, errors_handler.NotFound("product")
 	}
 	return product, err
+}
+
+func (s *ProductService) CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error) {
+	id, err := s.repo.CreateProduct(input, file)
+
+	if errors_handler.ErrorIsType(err, errors_handler.TypeForeignKeyViolation) {
+		return id, errors_handler.BadRequest("provided category_id does not correspond to any existing category")
+	}
+	return id, err
+}
+
+func (s *ProductService) UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error {
+	err := s.repo.UpdateProduct(id, input, file)
+
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return errors_handler.NotFound("product")
+	}
+	return err
 }
