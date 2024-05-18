@@ -7,12 +7,41 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/renlin-code/mock-shop-api/pkg/domain"
 )
 
 const (
 	authorizationHeader = "Authorization"
 	userCtx             = "UserId"
 )
+
+func (h *Handler) adminIdentity(c *gin.Context) {
+	header := c.GetHeader(authorizationHeader)
+
+	if header == "" {
+		Fail(c, "no authorization header provided", http.StatusUnauthorized)
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+
+	if len(headerParts) != 2 {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	if headerParts[0] != "Bearer" {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	adminSecret := os.Getenv("ADMIN_SECRET")
+
+	if headerParts[1] != adminSecret {
+		Fail(c, "invalid authorization header", http.StatusUnauthorized)
+		return
+	}
+}
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
@@ -60,30 +89,13 @@ func getUserId(c *gin.Context) (int, error) {
 	return idInt, nil
 }
 
-func (h *Handler) adminIdentity(c *gin.Context) {
-	header := c.GetHeader(authorizationHeader)
-
-	if header == "" {
-		Fail(c, "no authorization header provided", http.StatusUnauthorized)
-		return
+func computePaginationParams(params domain.PaginationParams) (limit, offset int) {
+	if params.Page == 0 || params.PageSize == 0 {
+		limit = 10
+		offset = 0
+	} else {
+		limit = params.PageSize
+		offset = (params.Page - 1) * params.PageSize
 	}
-
-	headerParts := strings.Split(header, " ")
-
-	if len(headerParts) != 2 {
-		Fail(c, "invalid authorization header", http.StatusUnauthorized)
-		return
-	}
-
-	if headerParts[0] != "Bearer" {
-		Fail(c, "invalid authorization header", http.StatusUnauthorized)
-		return
-	}
-
-	adminSecret := os.Getenv("ADMIN_SECRET")
-
-	if headerParts[1] != adminSecret {
-		Fail(c, "invalid authorization header", http.StatusUnauthorized)
-		return
-	}
+	return limit, offset
 }

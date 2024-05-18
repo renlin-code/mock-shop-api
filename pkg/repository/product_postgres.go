@@ -22,10 +22,10 @@ func newProductPostgres(db *sqlx.DB, s *storage.Storage) *ProductPostgres {
 	return &ProductPostgres{db, s}
 }
 
-func (r *ProductPostgres) GetAll() ([]domain.Product, error) {
+func (r *ProductPostgres) GetAll(limit, offset int) ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id", productsTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT %d OFFSET %d", productsTable, limit, offset)
 
 	err := r.db.Select(&products, query)
 	if err == sql.ErrNoRows {

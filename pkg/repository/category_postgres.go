@@ -22,10 +22,10 @@ func newCategoryPostgres(db *sqlx.DB, s *storage.Storage) *CategoryPostgres {
 	return &CategoryPostgres{db, s}
 }
 
-func (r *CategoryPostgres) GetAll() ([]domain.Category, error) {
+func (r *CategoryPostgres) GetAll(limit, offset int) ([]domain.Category, error) {
 	var categories []domain.Category
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id", categoriesTables)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT %d OFFSET %d", categoriesTables, limit, offset)
 
 	err := r.db.Select(&categories, query)
 	if err == sql.ErrNoRows {
@@ -48,10 +48,10 @@ func (r *CategoryPostgres) GetById(id int) (domain.Category, error) {
 	return category, err
 }
 
-func (r *CategoryPostgres) GetProducts(categoryId int) ([]domain.Product, error) {
+func (r *CategoryPostgres) GetProducts(categoryId, limit, offset int) ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true ORDER BY id", productsTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true ORDER BY id LIMIT %d OFFSET %d", productsTable, limit, offset)
 
 	err := r.db.Select(&products, query, categoryId)
 	if err == sql.ErrNoRows {

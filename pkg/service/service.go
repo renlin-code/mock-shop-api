@@ -17,15 +17,15 @@ type Authorization interface {
 }
 
 type Category interface {
-	GetAll() ([]domain.Category, error)
+	GetAll(limit, offset int) ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
-	GetProducts(categoryId int) ([]domain.Product, error)
+	GetProducts(categoryId, limit, offset int) ([]domain.Product, error)
 	CreateCategory(input domain.CreateCategoryInput, file multipart.File) (int, error)
 	UpdateCategory(id int, input domain.UpdateCategoryInput, file multipart.File) error
 }
 
 type Product interface {
-	GetAll() ([]domain.Product, error)
+	GetAll(limit, offset int) ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
 	CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error)
 	UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error
@@ -35,7 +35,7 @@ type Profile interface {
 	GetProfile(userId int) (domain.User, error)
 	UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
-	GetAllOrders(userId int) ([]domain.Order, error)
+	GetAllOrders(userId, limit, offset int) ([]domain.Order, error)
 	GetOrderById(userId, orderId int) (domain.Order, error)
 }
 

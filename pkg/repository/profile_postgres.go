@@ -111,7 +111,7 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 		description, 
 		price, 
 		undiscounted_price, 
-		images_urls, 
+		image_url, 
 		quantity
 	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`, orderedProductsTable)
 
@@ -127,7 +127,7 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 			description, 
 			price, 
 			undiscounted_price, 
-			images_urls, 
+			image_url, 
 			stock
 		`, productsTable)
 		var productFromTable domain.Product
@@ -163,57 +163,47 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 	return orderId, tx.Commit()
 }
 
-func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
+func (r *ProfilePostgres) GetAllOrders(userId, limit, offset int) ([]domain.Order, error) {
 	query := fmt.Sprintf(`
-		WITH order_products AS (
-			SELECT 
-				ot.id AS order_id, 
-				ot.user_id, 
-				ot.date, 
-				opt.id, 
-				opt.product_id, 
-				opt.name, 
-				opt.description, 
-				opt.price, 
-				opt.undiscounted_price, 
-				opt.images_urls, 
-				opt.quantity
-			FROM %s ot
-			INNER JOIN %s opt ON opt.order_id = ot.id
-			WHERE ot.user_id = $1
-		),
-		order_total_cost AS (
-			SELECT 
-				order_id, 
-				SUM(price) AS total_cost
-			FROM order_products
-			GROUP BY order_id
+		WITH order_total_cost AS (
+			SELECT order_id, SUM(price * quantity) AS total_cost
+				FROM %s opt
+				GROUP BY opt.order_id
+				ORDER BY opt.order_id
 		)
 		SELECT 
-			op.order_id, 
-			op.user_id, 
-			op.date, 
-			op.id, 
-			op.product_id,
-			op.name, 
-			op.description, 
-			op.price, 
-			op.undiscounted_price, 
-			op.images_urls, 
-			op.quantity, 
-			otc.total_cost
-		FROM order_products op
-		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
-		ORDER BY id
-	`, ordersTable, orderedProductsTable)
+			ot.id AS order_id,     
+			ot.user_id, 
+			ot.date,     
+			opt.id, 
+			opt.product_id,     
+			opt.name, 
+			opt.description,     
+			opt.price, 
+			opt.undiscounted_price,     
+			opt.image_url, 
+			opt.quantity,
+			otct.total_cost
+		FROM 
+			( SELECT * 
+			FROM %s ot
+			WHERE ot.user_id = $1
+			ORDER BY ot.id
+			LIMIT %v
+			OFFSET %v
+			) ot
+		INNER JOIN %s opt
+		ON ot.id = opt.order_id
+		INNER JOIN order_total_cost otct
+		ON otct.order_id = ot.id
+		ORDER BY ot.id, opt.id;
+	`, orderedProductsTable, ordersTable, limit, offset, orderedProductsTable)
 
 	rows, err := r.db.Query(query, userId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
-	var ordersMap = make(map[int]domain.Order)
 	var orders []domain.Order
 	for rows.Next() {
 		var order domain.Order
@@ -234,60 +224,53 @@ func (r *ProfilePostgres) GetAllOrders(userId int) ([]domain.Order, error) {
 		if err != nil {
 			return nil, err
 		}
-		if existingOrder, found := ordersMap[order.Id]; found {
-			existingOrder.Products = append(existingOrder.Products, product)
-			ordersMap[order.Id] = existingOrder
-		} else {
-			order.Products = append(order.Products, product)
-			ordersMap[order.Id] = order
+
+		order.Products = append(order.Products, product)
+
+		var exists bool
+		for i, o := range orders {
+			if o.Id == order.Id {
+				orders[i].Products = append(orders[i].Products, product)
+				exists = true
+				break
+			}
 		}
-	}
-	for _, order := range ordersMap {
-		orders = append(orders, order)
+
+		if !exists {
+			orders = append(orders, order)
+		}
 	}
 	return orders, nil
 }
 
 func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error) {
 	query := fmt.Sprintf(`
-		WITH order_products AS (
-			SELECT 
-				ot.id AS order_id, 
-				ot.user_id, 
-				ot.date, 
-				opt.id, 
-				opt.product_id, 
-				opt.name, 
-				opt.description, 
-				opt.price, 
-				opt.undiscounted_price, 
-				opt.images_urls, 
-				opt.quantity
-			FROM %s ot
-			INNER JOIN %s opt ON opt.order_id = ot.id
-			WHERE ot.id = $1 AND ot.user_id = $2
-		),
-		order_total_cost AS (
-			SELECT order_id, SUM(price) AS total_cost
-			FROM order_products
-			GROUP BY order_id
+		WITH order_total_cost AS (
+			SELECT order_id, SUM(price * quantity) AS total_cost
+				FROM %s op
+				WHERE order_id=$1
+				GROUP BY order_id
 		)
-		SELECT 
-			op.order_id, 
-			op.user_id, 
-			op.date, 
-			op.id, 
-			op.product_id, 
-			op.name, 
-			op.description, 
-			op.price, 
-			op.undiscounted_price, 
-			op.images_urls, 
-			op.quantity, 
-			otc.total_cost
-		FROM order_products op
-		LEFT JOIN order_total_cost otc ON op.order_id = otc.order_id
-	`, ordersTable, orderedProductsTable)
+			SELECT 
+				ot.id AS order_id,     
+				ot.user_id, 
+				ot.date,     
+				opt.id, 
+				opt.product_id,     
+				opt.name, 
+				opt.description,     
+				opt.price, 
+				opt.undiscounted_price,     
+				opt.image_url, 
+				opt.quantity,
+				otct.total_cost
+			FROM %s ot
+			INNER JOIN %s opt
+			ON opt.order_id = ot.id 
+			INNER JOIN order_total_cost otct
+			ON otct.order_id = ot.id
+			WHERE ot.id=$1 AND ot.user_id=$2
+		`, orderedProductsTable, ordersTable, orderedProductsTable)
 
 	var order domain.Order
 

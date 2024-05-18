@@ -33,8 +33,8 @@ func (s *ProfileService) CreateOrder(userId int, products []domain.CreateOrderIn
 
 }
 
-func (s *ProfileService) GetAllOrders(userId int) ([]domain.Order, error) {
-	return s.repo.GetAllOrders(userId)
+func (s *ProfileService) GetAllOrders(userId, limit, offset int) ([]domain.Order, error) {
+	return s.repo.GetAllOrders(userId, limit, offset)
 }
 
 func (s *ProfileService) GetOrderById(userId, orderId int) (domain.Order, error) {

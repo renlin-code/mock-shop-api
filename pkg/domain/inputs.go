@@ -294,3 +294,15 @@ func (i UpdateProductInput) Validate() error {
 	}
 	return nil
 }
+
+type PaginationParams struct {
+	Page     int `form:"page"`
+	PageSize int `form:"page_size"`
+}
+
+func (p PaginationParams) Validate() error {
+	return validation.ValidateStruct(&p,
+		validation.Field(&p.Page, validation.Min(1)),
+		validation.Field(&p.PageSize, validation.Min(1), validation.Max(100)),
+	)
+}

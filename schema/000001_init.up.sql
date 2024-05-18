@@ -40,6 +40,6 @@ CREATE TABLE ordered_products (
     description VARCHAR(255) NOT NULL,
     price NUMERIC(12, 2) NOT NULL  CHECK (price >= 0),
     undiscounted_price NUMERIC(12, 2) NOT NULL  CHECK (undiscounted_price >= price),
-    images_urls TEXT NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0)
 );

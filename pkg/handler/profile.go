@@ -69,7 +69,7 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 	}
 	var input domain.CreateOrderInput
 	if err := c.BindJSON(&input); err != nil {
-		Fail(c, bindErrorText, http.StatusBadRequest)
+		Fail(c, bindJSONErrorText, http.StatusBadRequest)
 		return
 	}
 	if err := input.Validate(); err != nil {
@@ -87,11 +87,23 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 }
 
 func (h *Handler) userGetAllOrder(c *gin.Context) {
+	var params domain.PaginationParams
+	if err := c.BindQuery(&params); err != nil {
+		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
+		return
+	}
+	if err := params.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	userId, err := getUserId(c)
 	if err != nil {
 		return
 	}
-	orders, err := h.services.Profile.GetAllOrders(userId)
+
+	limit, offset := computePaginationParams(params)
+	orders, err := h.services.Profile.GetAllOrders(userId, limit, offset)
 
 	if err != nil {
 		FailAndHandleErr(c, err)

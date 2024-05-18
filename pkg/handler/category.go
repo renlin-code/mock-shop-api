@@ -9,7 +9,17 @@ import (
 )
 
 func (h *Handler) getAllCategories(c *gin.Context) {
-	categories, err := h.services.Category.GetAll()
+	var params domain.PaginationParams
+	if err := c.BindQuery(&params); err != nil {
+		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
+		return
+	}
+	if err := params.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	categories, err := h.services.Category.GetAll(computePaginationParams(params))
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return
@@ -35,13 +45,24 @@ func (h *Handler) getCategoryById(c *gin.Context) {
 }
 
 func (h *Handler) getCategoryProducts(c *gin.Context) {
+	var params domain.PaginationParams
+	if err := c.BindQuery(&params); err != nil {
+		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
+		return
+	}
+	if err := params.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	catId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		Fail(c, invalidIdErrorText, http.StatusBadRequest)
 		return
 	}
 
-	products, err := h.services.Category.GetProducts(catId)
+	limit, offset := computePaginationParams(params)
+	products, err := h.services.Category.GetProducts(catId, limit, offset)
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return

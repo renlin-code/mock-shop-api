@@ -9,7 +9,17 @@ import (
 )
 
 func (h *Handler) getAllProducts(c *gin.Context) {
-	categories, err := h.services.Product.GetAll()
+	var params domain.PaginationParams
+	if err := c.BindQuery(&params); err != nil {
+		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
+		return
+	}
+	if err := params.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	categories, err := h.services.Product.GetAll(computePaginationParams(params))
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return

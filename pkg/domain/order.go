@@ -10,12 +10,12 @@ type Order struct {
 
 type OrderedProduct struct {
 	Id                int     `json:"id" db:"id"`
-	OrderId           int     `json:"order_id" db:"order_id"`
+	OrderId           int     `json:"-" db:"order_id"`
 	ProductId         int     `json:"product_id" db:"product_id"`
 	Name              string  `json:"name"`
 	Description       string  `json:"description"`
 	Price             float32 `json:"price"`
 	UndiscountedPrice float32 `json:"undiscounted_price" db:"undiscounted_price"`
-	ImageUrl          string  `json:"images_urls" db:"images_urls"`
+	ImageUrl          string  `json:"image_url" db:"image_url"`
 	Quantity          int     `json:"quantity"`
 }

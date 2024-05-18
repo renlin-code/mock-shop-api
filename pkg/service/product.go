@@ -16,8 +16,8 @@ func newProductService(repo repository.Product) *ProductService {
 	return &ProductService{repo}
 }
 
-func (s *ProductService) GetAll() ([]domain.Product, error) {
-	products, err := s.repo.GetAll()
+func (s *ProductService) GetAll(limit, offset int) ([]domain.Product, error) {
+	products, err := s.repo.GetAll(limit, offset)
 	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
 		return products, errors_handler.NotFound("products")
 	}
