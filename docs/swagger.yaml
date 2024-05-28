@@ -1,0 +1,262 @@
+basePath: /
+definitions:
+  domain.ConfirmEmailInput:
+    properties:
+      password:
+        type: string
+      token:
+        type: string
+    type: object
+  domain.RecoveryPasswordInput:
+    properties:
+      email:
+        type: string
+    type: object
+  domain.SignInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  domain.SignUpInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  domain.UpdatePasswordInput:
+    properties:
+      password:
+        type: string
+      token:
+        type: string
+    type: object
+  handler.response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8020
+info:
+  contact: {}
+  description: API Service for a Mock Online Shop
+  title: Mock Shop API
+  version: "1.0"
+paths:
+  /auth/confirm-email:
+    post:
+      consumes:
+      - application/json
+      description: Confirm the specified email when creating a user account and add
+        a password for the account. If the request is successful, the user account
+        is created and the user can log into it.
+      operationId: confirm-email
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ConfirmEmailInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: User Confirm Email
+      tags:
+      - auth
+  /auth/password-recovery:
+    post:
+      consumes:
+      - application/json
+      description: 'Recovery password. If the request is successful, the service sends
+        an e-mail to the account email address with an email confirmation token as
+        a URL param "confToken". For example: https://client.com/password-recovery?confToken=eyJhbGciOiJIU1iIR5csdDIkwErXVCJ9.
+        This token is required to set a new password.'
+      operationId: recovery-password
+      parameters:
+      - description: account email
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RecoveryPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: User Recovery Password
+      tags:
+      - auth
+  /auth/password-update:
+    post:
+      consumes:
+      - application/json
+      description: Set new password. If the request is successful, the account password
+        is changed for the specified new password.
+      operationId: update-password
+      parameters:
+      - description: account new password
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdatePasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: User Update Password
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Log into an existing user account. If the request is successful,
+        the service returns an authorization token.
+      operationId: login
+      parameters:
+      - description: account access
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: User Sign In
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: 'Create a user account. With this account the user can place orders.
+        If the request is successful, the service sends an e-mail to the specified
+        email address with an email confirmation token as a URL param "confToken".
+        For example: https://store.com/confirm-email?confToken=eyJhbGciOiJIU1iIR5csdDIkwErXVCJ9.
+        This token is required to confirm specified user email.'
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: User Sign Up
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

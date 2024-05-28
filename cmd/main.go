@@ -17,6 +17,16 @@ import (
 	"github.com/spf13/viper"
 )
 
+// @title Mock Shop API
+// @version 1.0
+// @description API Service for a Mock Online Shop
+
+// @host localhost:8020
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 	if err := initConfig(); err != nil {
