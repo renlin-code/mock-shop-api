@@ -189,17 +189,17 @@ func (r *ProfilePostgres) GetAllOrders(userId, limit, offset int) ([]domain.Orde
 			FROM %s ot
 			WHERE ot.user_id = $1
 			ORDER BY ot.id
-			LIMIT %v
-			OFFSET %v
+			LIMIT $2
+			OFFSET $3
 			) ot
 		INNER JOIN %s opt
 		ON ot.id = opt.order_id
 		INNER JOIN order_total_cost otct
 		ON otct.order_id = ot.id
 		ORDER BY ot.id, opt.id;
-	`, orderedProductsTable, ordersTable, limit, offset, orderedProductsTable)
+	`, orderedProductsTable, ordersTable, orderedProductsTable)
 
-	rows, err := r.db.Query(query, userId)
+	rows, err := r.db.Query(query, userId, limit, offset)
 	if err != nil {
 		return nil, err
 	}

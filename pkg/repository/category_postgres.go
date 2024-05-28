@@ -25,9 +25,9 @@ func newCategoryPostgres(db *sqlx.DB, s *storage.Storage) *CategoryPostgres {
 func (r *CategoryPostgres) GetAll(limit, offset int) ([]domain.Category, error) {
 	var categories []domain.Category
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT %d OFFSET %d", categoriesTables, limit, offset)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT $1 OFFSET $2", categoriesTables)
 
-	err := r.db.Select(&categories, query)
+	err := r.db.Select(&categories, query, limit, offset)
 	if err == sql.ErrNoRows {
 		return categories, errors_handler.NoRows()
 	}
@@ -51,9 +51,9 @@ func (r *CategoryPostgres) GetById(id int) (domain.Category, error) {
 func (r *CategoryPostgres) GetProducts(categoryId, limit, offset int) ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true ORDER BY id LIMIT %d OFFSET %d", productsTable, limit, offset)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true ORDER BY id LIMIT $2 OFFSET $3", productsTable)
 
-	err := r.db.Select(&products, query, categoryId)
+	err := r.db.Select(&products, query, categoryId, limit, offset)
 	if err == sql.ErrNoRows {
 		return products, errors_handler.NoRows()
 	}
@@ -149,6 +149,11 @@ func (r *CategoryPostgres) UpdateCategory(categoryId int, input domain.UpdateCat
 
 	var id int
 	err = tx.QueryRow(query, args...).Scan(&id)
+	pqErr, ok := err.(*pq.Error)
+	if ok && pqErr.Code.Name() == "unique_violation" {
+		return errors_handler.AlreadyExists("category")
+	}
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors_handler.NoRows()

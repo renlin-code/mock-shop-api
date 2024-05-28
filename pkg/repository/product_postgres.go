@@ -25,9 +25,9 @@ func newProductPostgres(db *sqlx.DB, s *storage.Storage) *ProductPostgres {
 func (r *ProductPostgres) GetAll(limit, offset int) ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT %d OFFSET %d", productsTable, limit, offset)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT $1 OFFSET $2", productsTable)
 
-	err := r.db.Select(&products, query)
+	err := r.db.Select(&products, query, limit, offset)
 	if err == sql.ErrNoRows {
 		return products, errors_handler.NoRows()
 	}

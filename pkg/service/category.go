@@ -55,5 +55,9 @@ func (s *CategoryService) UpdateCategory(id int, input domain.UpdateCategoryInpu
 	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
 		return errors_handler.NotFound("category")
 	}
+	if errors_handler.ErrorIsType(err, errors_handler.TypeAlreadyExists) {
+		return errors_handler.BadRequest("category with such name already exists")
+	}
+
 	return err
 }

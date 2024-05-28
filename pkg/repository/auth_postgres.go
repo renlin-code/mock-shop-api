@@ -54,11 +54,15 @@ func (r *AuthPostgres) GetUserByEmail(email string) (domain.User, error) {
 }
 
 func (r *AuthPostgres) UpdatePassword(userId int, password string) error {
-	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE id=$2", usersTable)
+	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE id=$2 RETURNING id", usersTable)
 
-	_, err := r.db.Exec(query, password, userId)
-	if err == sql.ErrNoRows {
-		return errors_handler.NoRows()
+	var id int
+	row := r.db.QueryRow(query, password, userId)
+	if err := row.Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return errors_handler.NoRows()
+		}
+		return err
 	}
-	return err
+	return nil
 }
