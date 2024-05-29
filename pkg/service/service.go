@@ -37,6 +37,7 @@ type Profile interface {
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
 	GetAllOrders(userId, limit, offset int) ([]domain.Order, error)
 	GetOrderById(userId, orderId int) (domain.Order, error)
+	DeleteProfile(userId int, password string) error
 }
 
 type Service struct {

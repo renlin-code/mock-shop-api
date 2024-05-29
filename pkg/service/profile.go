@@ -47,3 +47,11 @@ func (s *ProfileService) GetOrderById(userId, orderId int) (domain.Order, error)
 	}
 	return order, err
 }
+
+func (s *ProfileService) DeleteProfile(userId int, password string) error {
+	err := s.repo.DeleteProfile(userId, generatePasswordHash(password))
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return errors_handler.BadRequest("incorrect password")
+	}
+	return err
+}

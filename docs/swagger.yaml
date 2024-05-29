@@ -21,6 +21,11 @@ definitions:
       quantity:
         type: integer
     type: object
+  domain.DeleteProfileInput:
+    properties:
+      password:
+        type: string
+    type: object
   domain.RecoveryPasswordInput:
     properties:
       email:
@@ -269,10 +274,50 @@ paths:
       tags:
       - User Authorization
   /profile/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user profile.
+      operationId: delete-user-account
+      parameters:
+      - description: Account password
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.DeleteProfileInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User Profile
+      tags:
+      - User Profile
     get:
       consumes:
       - application/json
-      description: Get a user account.
+      description: Get user account.
       operationId: get-user-account
       produces:
       - application/json
@@ -384,7 +429,7 @@ paths:
             $ref: '#/definitions/handler.response'
       security:
       - ApiKeyAuth: []
-      summary: User Get Orders
+      summary: Get Orders
       tags:
       - User Profile
     post:
@@ -426,7 +471,7 @@ paths:
             $ref: '#/definitions/handler.response'
       security:
       - ApiKeyAuth: []
-      summary: User Create Order
+      summary: Create Order
       tags:
       - User Profile
   /profile/orders/{id}:
@@ -466,7 +511,7 @@ paths:
             $ref: '#/definitions/handler.response'
       security:
       - ApiKeyAuth: []
-      summary: User Get Order By Id
+      summary: Get Order By Id
       tags:
       - User Profile
 securityDefinitions:

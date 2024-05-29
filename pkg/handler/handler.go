@@ -38,6 +38,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		profile.GET("/", h.getUserProfile)
 		profile.PUT("/", h.updateUserProfile)
+		profile.DELETE("/", h.deleteUserProfile)
 
 		orders := profile.Group("/orders")
 		{

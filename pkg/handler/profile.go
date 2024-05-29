@@ -11,7 +11,7 @@ import (
 // @Summary Get User Account
 // @Security ApiKeyAuth
 // @Tags User Profile
-// @Description Get a user account.
+// @Description Get user account.
 // @ID get-user-account
 // @Accept  json
 // @Produce  json
@@ -88,7 +88,7 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 	OK(c)
 }
 
-// @Summary User Create Order
+// @Summary Create Order
 // @Security ApiKeyAuth
 // @Tags User Profile
 // @Description Create a new order. If the request is successful, a new order is added to the user's list of orders and the stock of products in the catalog is updated.
@@ -125,7 +125,7 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 	OKId(c, id)
 }
 
-// @Summary User Get Orders
+// @Summary Get Orders
 // @Security ApiKeyAuth
 // @Tags User Profile
 // @Description Get all user's orders.
@@ -165,7 +165,7 @@ func (h *Handler) userGetAllOrder(c *gin.Context) {
 	Response(c, orders)
 }
 
-// @Summary User Get Order By Id
+// @Summary Get Order By Id
 // @Security ApiKeyAuth
 // @Tags User Profile
 // @Description Get user's order by id.
@@ -196,4 +196,40 @@ func (h *Handler) userGetOrderById(c *gin.Context) {
 		return
 	}
 	Response(c, order)
+}
+
+// @Summary Delete User Profile
+// @Security ApiKeyAuth
+// @Tags User Profile
+// @Description Delete user profile.
+// @ID delete-user-account
+// @Accept  json
+// @Produce  json
+// @Param input body domain.DeleteProfileInput true "Account password"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /profile/ [delete]
+func (h *Handler) deleteUserProfile(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		return
+	}
+	var input domain.DeleteProfileInput
+	if err := c.BindJSON(&input); err != nil {
+		Fail(c, bindJSONErrorText, http.StatusBadRequest)
+		return
+	}
+	if err := input.Validate(); err != nil {
+		Fail(c, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = h.services.Profile.DeleteProfile(userId, input.Password)
+	if err != nil {
+		FailAndHandleErr(c, err)
+		return
+	}
+
+	OK(c)
 }

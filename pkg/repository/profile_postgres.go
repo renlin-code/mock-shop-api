@@ -309,3 +309,14 @@ func (r *ProfilePostgres) GetOrderById(userId, orderId int) (domain.Order, error
 	}
 	return order, nil
 }
+
+func (r *ProfilePostgres) DeleteProfile(userId int, password string) error {
+	var id int
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id=$1 AND password_hash=$2 RETURNING id`, usersTable)
+	err := r.db.QueryRow(query, userId, password).Scan(&id)
+	if err == sql.ErrNoRows {
+		return errors_handler.NoRows()
+	}
+
+	return err
+}

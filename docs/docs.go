@@ -317,7 +317,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get a user account.",
+                "description": "Get user account.",
                 "consumes": [
                     "application/json"
                 ],
@@ -426,6 +426,68 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete user profile.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Delete User Profile",
+                "operationId": "delete-user-account",
+                "parameters": [
+                    {
+                        "description": "Account password",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.DeleteProfileInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.response"
+                        }
+                    }
+                }
             }
         },
         "/profile/orders": {
@@ -445,7 +507,7 @@ const docTemplate = `{
                 "tags": [
                     "User Profile"
                 ],
-                "summary": "User Get Orders",
+                "summary": "Get Orders",
                 "operationId": "get-orders",
                 "parameters": [
                     {
@@ -510,7 +572,7 @@ const docTemplate = `{
                 "tags": [
                     "User Profile"
                 ],
-                "summary": "User Create Order",
+                "summary": "Create Order",
                 "operationId": "create-order",
                 "parameters": [
                     {
@@ -574,7 +636,7 @@ const docTemplate = `{
                 "tags": [
                     "User Profile"
                 ],
-                "summary": "User Get Order By Id",
+                "summary": "Get Order By Id",
                 "operationId": "get-order-by-id",
                 "parameters": [
                     {
@@ -651,6 +713,14 @@ const docTemplate = `{
                 },
                 "quantity": {
                     "type": "integer"
+                }
+            }
+        },
+        "domain.DeleteProfileInput": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
                 }
             }
         },

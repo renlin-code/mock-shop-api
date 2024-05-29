@@ -69,23 +69,6 @@ func (i SignInInput) Validate() error {
 	)
 }
 
-type UpdateProfileInput struct {
-	Name           *string               `json:"name"`
-	ProfileImgFile *multipart.FileHeader `json:"profile_image_file"`
-}
-
-func (i UpdateProfileInput) Validate() error {
-	if i.Name == nil && i.ProfileImgFile == nil {
-		return errors.New("no fields provided")
-	}
-	if i.ProfileImgFile != nil {
-		return validateFile(i.ProfileImgFile, maxFileSize, allowedFileExtensions[:])
-	}
-	return validation.ValidateStruct(&i,
-		validation.Field(&i.Name, validation.Length(userNameMinLength, userNameMaxLength)),
-	)
-}
-
 type RecoveryPasswordInput struct {
 	Email string `json:"email"`
 }
@@ -104,6 +87,33 @@ type UpdatePasswordInput struct {
 func (i UpdatePasswordInput) Validate() error {
 	return validation.ValidateStruct(&i,
 		validation.Field(&i.Token, validation.Required),
+		validation.Field(&i.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
+	)
+}
+
+type UpdateProfileInput struct {
+	Name           *string               `json:"name"`
+	ProfileImgFile *multipart.FileHeader `json:"profile_image_file"`
+}
+
+func (i UpdateProfileInput) Validate() error {
+	if i.Name == nil && i.ProfileImgFile == nil {
+		return errors.New("no fields provided")
+	}
+	if i.ProfileImgFile != nil {
+		return validateFile(i.ProfileImgFile, maxFileSize, allowedFileExtensions[:])
+	}
+	return validation.ValidateStruct(&i,
+		validation.Field(&i.Name, validation.Length(userNameMinLength, userNameMaxLength)),
+	)
+}
+
+type DeleteProfileInput struct {
+	Password string `json:"password"`
+}
+
+func (i DeleteProfileInput) Validate() error {
+	return validation.ValidateStruct(&i,
 		validation.Field(&i.Password, validation.Required, validation.Length(passwordMinLength, passwordMaxLength)),
 	)
 }
