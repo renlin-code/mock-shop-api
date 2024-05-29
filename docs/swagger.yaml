@@ -340,6 +340,10 @@ paths:
         in: query
         name: pageSize
         type: string
+      - description: Search query param
+        in: query
+        name: search
+        type: string
       produces:
       - application/json
       responses:
@@ -365,7 +369,7 @@ paths:
             $ref: '#/definitions/handler.response'
       summary: Get Categories
       tags:
-      - Product Сategories
+      - Сategories
   /api/categories/{id}:
     get:
       consumes:
@@ -403,7 +407,7 @@ paths:
             $ref: '#/definitions/handler.response'
       summary: Get Category By Id
       tags:
-      - Product Сategories
+      - Сategories
   /api/categories/{id}/products:
     get:
       consumes:
@@ -423,6 +427,10 @@ paths:
       - description: 'Pagination: amount of items per page'
         in: query
         name: pageSize
+        type: string
+      - description: Search query param
+        in: query
+        name: search
         type: string
       produces:
       - application/json
@@ -464,6 +472,10 @@ paths:
       - description: 'Pagination: amount of items per page'
         in: query
         name: pageSize
+        type: string
+      - description: Search query param
+        in: query
+        name: search
         type: string
       produces:
       - application/json

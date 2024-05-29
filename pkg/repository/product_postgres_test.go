@@ -81,7 +81,7 @@ func TestGetAllProducts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
 
-			got, err := r.GetAll(tt.input.limit, tt.input.offset)
+			got, err := r.GetAll(tt.input.limit, tt.input.offset, "")
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

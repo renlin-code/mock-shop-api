@@ -83,5 +83,6 @@ func errTypeStatusCode(errType errors_handler.Type) int {
 const (
 	bindJSONErrorText             = "invalid request body"
 	bindPaginationParamsErrorText = "invalid pagination param"
+	bindSearchParamErrorText      = "invalid search param"
 	invalidIdErrorText            = "invalid id param"
 )

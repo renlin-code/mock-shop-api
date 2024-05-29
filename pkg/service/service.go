@@ -17,15 +17,15 @@ type Authorization interface {
 }
 
 type Category interface {
-	GetAll(limit, offset int) ([]domain.Category, error)
+	GetAll(limit, offset int, search string) ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
-	GetProducts(categoryId, limit, offset int) ([]domain.Product, error)
+	GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error)
 	CreateCategory(input domain.CreateCategoryInput, file multipart.File) (int, error)
 	UpdateCategory(id int, input domain.UpdateCategoryInput, file multipart.File) error
 }
 
 type Product interface {
-	GetAll(limit, offset int) ([]domain.Product, error)
+	GetAll(limit, offset int, search string) ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
 	CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error)
 	UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error

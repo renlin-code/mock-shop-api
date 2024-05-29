@@ -16,8 +16,8 @@ func newCategoryService(repo repository.Category) *CategoryService {
 	return &CategoryService{repo}
 }
 
-func (s *CategoryService) GetAll(limit, offset int) ([]domain.Category, error) {
-	categories, err := s.repo.GetAll(limit, offset)
+func (s *CategoryService) GetAll(limit, offset int, search string) ([]domain.Category, error) {
+	categories, err := s.repo.GetAll(limit, offset, search)
 	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
 		return categories, errors_handler.NotFound("categories")
 	}
@@ -32,8 +32,8 @@ func (s *CategoryService) GetById(id int) (domain.Category, error) {
 	return category, err
 }
 
-func (s *CategoryService) GetProducts(categoryId, limit, offset int) ([]domain.Product, error) {
-	products, err := s.repo.GetProducts(categoryId, limit, offset)
+func (s *CategoryService) GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error) {
+	products, err := s.repo.GetProducts(categoryId, limit, offset, search)
 	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
 		return products, errors_handler.NotFound("products")
 	}

@@ -415,7 +415,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product Сategories"
+                    "Сategories"
                 ],
                 "summary": "Get Categories",
                 "operationId": "get-categories",
@@ -430,6 +430,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
                         "in": "query"
                     }
                 ],
@@ -477,7 +483,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Product Сategories"
+                    "Сategories"
                 ],
                 "summary": "Get Category By Id",
                 "operationId": "get-category-by-id",
@@ -557,6 +563,12 @@ const docTemplate = `{
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -618,6 +630,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
                         "in": "query"
                     }
                 ],

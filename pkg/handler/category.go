@@ -9,30 +9,38 @@ import (
 )
 
 // @Summary Get Categories
-// @Tags Product Сategories
+// @Tags Сategories
 // @Description Get all product categories.
 // @ID get-categories
 // @Accept json
 // @Produce json
 // @Param page query string false "Pagination: page number"
 // @Param pageSize query string false "Pagination: amount of items per page"
+// @Param search query string false "Search query param"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /api/categories [get]
 func (h *Handler) getAllCategories(c *gin.Context) {
-	var params domain.PaginationParams
-	if err := c.BindQuery(&params); err != nil {
+	var paginationParams domain.PaginationParams
+	if err := c.BindQuery(&paginationParams); err != nil {
 		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
 		return
 	}
-	if err := params.Validate(); err != nil {
+	if err := paginationParams.Validate(); err != nil {
 		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	categories, err := h.services.Category.GetAll(computePaginationParams(params))
+	var searchParams domain.SearchParams
+	if err := c.BindQuery(&searchParams); err != nil {
+		Fail(c, bindSearchParamErrorText, http.StatusBadRequest)
+		return
+	}
+
+	limit, offset := computePaginationParams(paginationParams)
+	categories, err := h.services.Category.GetAll(limit, offset, searchParams.Search)
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return
@@ -42,7 +50,7 @@ func (h *Handler) getAllCategories(c *gin.Context) {
 }
 
 // @Summary Get Category By Id
-// @Tags Product Сategories
+// @Tags Сategories
 // @Description Get category by id.
 // @ID get-category-by-id
 // @Accept json
@@ -78,21 +86,30 @@ func (h *Handler) getCategoryById(c *gin.Context) {
 // @Param id path int true "Category id"
 // @Param page query string false "Pagination: page number"
 // @Param pageSize query string false "Pagination: amount of items per page"
+// @Param search query string false "Search query param"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /api/categories/{id}/products [get]
 func (h *Handler) getCategoryProducts(c *gin.Context) {
-	var params domain.PaginationParams
-	if err := c.BindQuery(&params); err != nil {
+	var paginationParams domain.PaginationParams
+	if err := c.BindQuery(&paginationParams); err != nil {
 		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
 		return
 	}
-	if err := params.Validate(); err != nil {
+	if err := paginationParams.Validate(); err != nil {
 		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	var searchParams domain.SearchParams
+	if err := c.BindQuery(&searchParams); err != nil {
+		Fail(c, bindSearchParamErrorText, http.StatusBadRequest)
+		return
+	}
+
+	limit, offset := computePaginationParams(paginationParams)
 
 	catId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -100,8 +117,7 @@ func (h *Handler) getCategoryProducts(c *gin.Context) {
 		return
 	}
 
-	limit, offset := computePaginationParams(params)
-	products, err := h.services.Category.GetProducts(catId, limit, offset)
+	products, err := h.services.Category.GetProducts(catId, limit, offset, searchParams.Search)
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return

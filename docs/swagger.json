@@ -409,7 +409,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product Сategories"
+                    "Сategories"
                 ],
                 "summary": "Get Categories",
                 "operationId": "get-categories",
@@ -424,6 +424,12 @@
                         "type": "string",
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
                         "in": "query"
                     }
                 ],
@@ -471,7 +477,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Product Сategories"
+                    "Сategories"
                 ],
                 "summary": "Get Category By Id",
                 "operationId": "get-category-by-id",
@@ -551,6 +557,12 @@
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -612,6 +624,12 @@
                         "type": "string",
                         "description": "Pagination: amount of items per page",
                         "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query param",
+                        "name": "search",
                         "in": "query"
                     }
                 ],

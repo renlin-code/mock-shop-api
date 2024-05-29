@@ -316,3 +316,7 @@ func (p PaginationParams) Validate() error {
 		validation.Field(&p.PageSize, validation.Min(1), validation.Max(100)),
 	)
 }
+
+type SearchParams struct {
+	Search string `form:"search"`
+}

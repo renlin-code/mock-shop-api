@@ -22,10 +22,14 @@ func newCategoryPostgres(db *sqlx.DB, s *storage.Storage) *CategoryPostgres {
 	return &CategoryPostgres{db, s}
 }
 
-func (r *CategoryPostgres) GetAll(limit, offset int) ([]domain.Category, error) {
+func (r *CategoryPostgres) GetAll(limit, offset int, search string) ([]domain.Category, error) {
 	var categories []domain.Category
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true ORDER BY id LIMIT $1 OFFSET $2", categoriesTables)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE available=true", categoriesTables)
+	if search != "" {
+		query += fmt.Sprintf(" AND name ILIKE '%%%s%%'", search)
+	}
+	query += " ORDER BY id LIMIT $1 OFFSET $2"
 
 	err := r.db.Select(&categories, query, limit, offset)
 	if err == sql.ErrNoRows {
@@ -48,10 +52,14 @@ func (r *CategoryPostgres) GetById(id int) (domain.Category, error) {
 	return category, err
 }
 
-func (r *CategoryPostgres) GetProducts(categoryId, limit, offset int) ([]domain.Product, error) {
+func (r *CategoryPostgres) GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error) {
 	var products []domain.Product
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true ORDER BY id LIMIT $2 OFFSET $3", productsTable)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE category_id=$1 AND available=true", productsTable)
+	if search != "" {
+		query += fmt.Sprintf(" AND name ILIKE '%%%s%%'", search)
+	}
+	query += " ORDER BY id LIMIT $2 OFFSET $3"
 
 	err := r.db.Select(&products, query, categoryId, limit, offset)
 	if err == sql.ErrNoRows {

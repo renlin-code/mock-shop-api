@@ -16,23 +16,31 @@ import (
 // @Produce json
 // @Param page query string false "Pagination: page number"
 // @Param pageSize query string false "Pagination: amount of items per page"
+// @Param search query string false "Search query param"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
 // @Failure 500 {object} response
 // @Failure default {object} response
 // @Router /api/products [get]
 func (h *Handler) getAllProducts(c *gin.Context) {
-	var params domain.PaginationParams
-	if err := c.BindQuery(&params); err != nil {
+	var paginationParams domain.PaginationParams
+	if err := c.BindQuery(&paginationParams); err != nil {
 		Fail(c, bindPaginationParamsErrorText, http.StatusBadRequest)
 		return
 	}
-	if err := params.Validate(); err != nil {
+	if err := paginationParams.Validate(); err != nil {
 		Fail(c, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	categories, err := h.services.Product.GetAll(computePaginationParams(params))
+	var searchParams domain.SearchParams
+	if err := c.BindQuery(&searchParams); err != nil {
+		Fail(c, bindSearchParamErrorText, http.StatusBadRequest)
+		return
+	}
+
+	limit, offset := computePaginationParams(paginationParams)
+	categories, err := h.services.Product.GetAll(limit, offset, searchParams.Search)
 	if err != nil {
 		FailAndHandleErr(c, err)
 		return
