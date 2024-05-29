@@ -8,7 +8,6 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/joho/godotenv"
 	"github.com/renlin-code/mock-shop-api/pkg/handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 	"github.com/renlin-code/mock-shop-api/pkg/service"
@@ -32,10 +31,11 @@ func main() {
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("Error initializating configs: %s", err.Error())
 	}
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("Error loading env variables: %s", err.Error())
-	}
-
+	/*
+		if err := godotenv.Load(); err != nil {
+			logrus.Fatalf("Error loading env variables: %s", err.Error())
+		}
+	*/
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
