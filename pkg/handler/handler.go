@@ -32,7 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/confirm-email", h.userConfirmEmail)
 		auth.POST("/sign-in", h.userSignIn)
 		auth.POST("/password-recovery", h.recoveryUserPassword)
-		auth.POST("/password-update", h.updateUserPassword)
+		auth.PUT("/password-update", h.updateUserPassword)
 	}
 	profile := router.Group("/profile", h.userIdentity)
 	{

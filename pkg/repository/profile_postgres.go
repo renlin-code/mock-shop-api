@@ -142,6 +142,9 @@ func (r *ProfilePostgres) CreateOrder(userId int, products []domain.CreateOrderI
 			&productFromTable.Stock)
 
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return 0, errors_handler.NoRows()
+			}
 			if pqErr, ok := err.(*pq.Error); ok && strings.Contains(pqErr.Message, "violates check constraint \"stock\"") {
 				return 0, errors_handler.ConstrainViolation("stock")
 			}

@@ -297,7 +297,7 @@ func (i UpdateProductInput) Validate() error {
 
 type PaginationParams struct {
 	Page     int `form:"page"`
-	PageSize int `form:"page_size"`
+	PageSize int `form:"pageSize"`
 }
 
 func (p PaginationParams) Validate() error {

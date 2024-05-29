@@ -26,6 +26,9 @@ func (s *ProfileService) UpdateProfile(userId int, input domain.UpdateProfileInp
 
 func (s *ProfileService) CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error) {
 	id, err := s.repo.CreateOrder(userId, products)
+	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {
+		return id, errors_handler.NotFound("product")
+	}
 	if errors_handler.ErrorIsType(err, errors_handler.TypeConstrainViolation) {
 		return id, errors_handler.BadRequest("quantity exceeds the stock")
 	}
