@@ -67,6 +67,468 @@ info:
   title: Mock Shop API
   version: "1.0"
 paths:
+  /admin/categories:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new category.
+      operationId: create-category
+      parameters:
+      - description: Category name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Category description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Category is available
+        in: formData
+        name: available
+        required: true
+        type: boolean
+      - description: Category image
+        in: formData
+        name: image_file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Category
+      tags:
+      - Admin
+  /admin/categories/{id}:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update category.
+      operationId: update-category
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category name
+        in: formData
+        name: name
+        type: string
+      - description: Category description
+        in: formData
+        name: description
+        type: string
+      - description: Category is available
+        in: formData
+        name: available
+        type: boolean
+      - description: Category image
+        in: formData
+        name: image_file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Category
+      tags:
+      - Admin
+  /admin/products:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new product.
+      operationId: create-product
+      parameters:
+      - description: Category id
+        in: formData
+        name: category_id
+        required: true
+        type: integer
+      - description: Product name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Product description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: Product actual price
+        in: formData
+        name: price
+        required: true
+        type: number
+      - description: Product price without any discount
+        in: formData
+        name: undiscounted_price
+        required: true
+        type: number
+      - description: Product stock
+        in: formData
+        name: stock
+        required: true
+        type: integer
+      - description: Product is available
+        in: formData
+        name: available
+        required: true
+        type: boolean
+      - description: Product image
+        in: formData
+        name: image_file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Product
+      tags:
+      - Admin
+  /admin/products/{id}:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update product.
+      operationId: update-product
+      parameters:
+      - description: Product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category id
+        in: formData
+        name: category_id
+        type: integer
+      - description: Product name
+        in: formData
+        name: name
+        type: string
+      - description: Product description
+        in: formData
+        name: description
+        type: string
+      - description: Product actual price
+        in: formData
+        name: price
+        type: number
+      - description: Product price without any discount
+        in: formData
+        name: undiscounted_price
+        type: number
+      - description: Product stock
+        in: formData
+        name: stock
+        type: integer
+      - description: Product is available
+        in: formData
+        name: available
+        type: boolean
+      - description: Product image
+        in: formData
+        name: image_file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Product
+      tags:
+      - Admin
+  /api/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all product categories.
+      operationId: get-categories
+      parameters:
+      - description: 'Pagination: page number'
+        in: query
+        name: page
+        type: string
+      - description: 'Pagination: amount of items per page'
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get Categories
+      tags:
+      - Product Сategories
+  /api/categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get category by id.
+      operationId: get-category-by-id
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get Category By Id
+      tags:
+      - Product Сategories
+  /api/categories/{id}/products:
+    get:
+      consumes:
+      - application/json
+      description: Get all products in a category.
+      operationId: get-category-products
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'Pagination: page number'
+        in: query
+        name: page
+        type: string
+      - description: 'Pagination: amount of items per page'
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get Category Products
+      tags:
+      - Products
+  /api/products:
+    get:
+      consumes:
+      - application/json
+      description: Get all products.
+      operationId: get-products
+      parameters:
+      - description: 'Pagination: page number'
+        in: query
+        name: page
+        type: string
+      - description: 'Pagination: amount of items per page'
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get Products
+      tags:
+      - Products
+  /api/products/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get product by id.
+      operationId: get-product-by-id
+      parameters:
+      - description: Product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.response'
+      summary: Get Product By Id
+      tags:
+      - Products
   /auth/confirm-email:
     post:
       consumes:

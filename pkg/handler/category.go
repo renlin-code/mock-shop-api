@@ -8,6 +8,19 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 )
 
+// @Summary Get Categories
+// @Tags Product Сategories
+// @Description Get all product categories.
+// @ID get-categories
+// @Accept json
+// @Produce json
+// @Param page query string false "Pagination: page number"
+// @Param pageSize query string false "Pagination: amount of items per page"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /api/categories [get]
 func (h *Handler) getAllCategories(c *gin.Context) {
 	var params domain.PaginationParams
 	if err := c.BindQuery(&params); err != nil {
@@ -28,6 +41,18 @@ func (h *Handler) getAllCategories(c *gin.Context) {
 	Response(c, categories)
 }
 
+// @Summary Get Category By Id
+// @Tags Product Сategories
+// @Description Get category by id.
+// @ID get-category-by-id
+// @Accept json
+// @Produce json
+// @Param id path int true "Category id"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /api/categories/{id} [get]
 func (h *Handler) getCategoryById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -44,6 +69,20 @@ func (h *Handler) getCategoryById(c *gin.Context) {
 	Response(c, category)
 }
 
+// @Summary Get Category Products
+// @Tags Products
+// @Description Get all products in a category.
+// @ID get-category-products
+// @Accept json
+// @Produce json
+// @Param id path int true "Category id"
+// @Param page query string false "Pagination: page number"
+// @Param pageSize query string false "Pagination: amount of items per page"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /api/categories/{id}/products [get]
 func (h *Handler) getCategoryProducts(c *gin.Context) {
 	var params domain.PaginationParams
 	if err := c.BindQuery(&params); err != nil {
@@ -71,6 +110,22 @@ func (h *Handler) getCategoryProducts(c *gin.Context) {
 	Response(c, products)
 }
 
+// @Summary Create Category
+// @Security ApiKeyAuth
+// @Tags Admin
+// @Description Create a new category.
+// @ID create-category
+// @Accept  multipart/form-data
+// @Produce json
+// @Param name formData string true "Category name"
+// @Param description formData string true "Category description"
+// @Param available formData boolean true "Category is available"
+// @Param image_file formData file true "Category image"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /admin/categories [post]
 func (h *Handler) adminCreateCategory(c *gin.Context) {
 	r := c.Request
 	var input domain.CreateCategoryInput
@@ -106,6 +161,23 @@ func (h *Handler) adminCreateCategory(c *gin.Context) {
 	OKId(c, id)
 }
 
+// @Summary Update Category
+// @Security ApiKeyAuth
+// @Tags Admin
+// @Description Update category.
+// @ID update-category
+// @Accept  multipart/form-data
+// @Produce json
+// @Param id path int true "Category id"
+// @Param name formData string false "Category name"
+// @Param description formData string false "Category description"
+// @Param available formData boolean false "Category is available"
+// @Param image_file formData file false "Category image"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /admin/categories/{id} [put]
 func (h *Handler) adminUpdateCategory(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

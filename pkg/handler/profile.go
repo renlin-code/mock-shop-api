@@ -13,8 +13,8 @@ import (
 // @Tags User Profile
 // @Description Get user account.
 // @ID get-user-account
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
 // @Failure 500 {object} response
@@ -40,7 +40,7 @@ func (h *Handler) getUserProfile(c *gin.Context) {
 // @Description Update user account info.
 // @ID update-user-account
 // @Accept  multipart/form-data
-// @Produce  json
+// @Produce json
 // @Param name formData string false "User name"
 // @Param profile_image_file formData file false "User profile image"
 // @Success 200 {object} response
@@ -93,8 +93,8 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 // @Tags User Profile
 // @Description Create a new order. If the request is successful, a new order is added to the user's list of orders and the stock of products in the catalog is updated.
 // @ID create-order
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.CreateOrderInput true "Order info"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -130,8 +130,8 @@ func (h *Handler) userCreateOrder(c *gin.Context) {
 // @Tags User Profile
 // @Description Get all user's orders.
 // @ID get-orders
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param page query string false "Pagination: page number"
 // @Param pageSize query string false "Pagination: amount of items per page"
 // @Success 200 {object} response
@@ -170,8 +170,8 @@ func (h *Handler) userGetAllOrder(c *gin.Context) {
 // @Tags User Profile
 // @Description Get user's order by id.
 // @ID get-order-by-id
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param id path int true "Order id"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -203,8 +203,8 @@ func (h *Handler) userGetOrderById(c *gin.Context) {
 // @Tags User Profile
 // @Description Delete user profile.
 // @ID delete-user-account
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.DeleteProfileInput true "Account password"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response

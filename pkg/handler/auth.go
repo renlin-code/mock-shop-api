@@ -11,8 +11,8 @@ import (
 // @Tags User Authorization
 // @Description Create a user account. With this account the user can place orders. If the request is successful, the service sends an e-mail to the specified email address with an email confirmation token as a URL param "confToken". For example: https://store.com/confirm-email?confToken=eyJhbGciOiJIU1iIR5csdDIkwErXVCJ9. This token is required to confirm specified user email.
 // @ID create-account
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.SignUpInput true "Account info"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -43,8 +43,8 @@ func (h *Handler) userSignUp(c *gin.Context) {
 // @Tags User Authorization
 // @Description Confirm the specified email when creating a user account and add a password for the account. If the request is successful, the user account is created and the user can log into it.
 // @ID confirm-email
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.ConfirmEmailInput true "Account info"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -75,8 +75,8 @@ func (h *Handler) userConfirmEmail(c *gin.Context) {
 // @Tags User Authorization
 // @Description Log into an existing user account. If the request is successful, the service returns an authorization token.
 // @ID login
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.SignInInput true "Account access"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -107,8 +107,8 @@ func (h *Handler) userSignIn(c *gin.Context) {
 // @Tags User Authorization
 // @Description Recovery password. If the request is successful, the service sends an e-mail to the account email address with an email confirmation token as a URL param "confToken". For example: https://client.com/password-recovery?confToken=eyJhbGciOiJIU1iIR5csdDIkwErXVCJ9. This token is required to set a new password.
 // @ID recovery-password
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.RecoveryPasswordInput true "Account email"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response
@@ -140,8 +140,8 @@ func (h *Handler) recoveryUserPassword(c *gin.Context) {
 // @Tags User Authorization
 // @Description Set new password. If the request is successful, the account password is changed for the specified new password.
 // @ID update-password
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body domain.UpdatePasswordInput true "Account new password"
 // @Success 200 {object} response
 // @Failure 400,404 {object} response

@@ -8,6 +8,19 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 )
 
+// @Summary Get Products
+// @Tags Products
+// @Description Get all products.
+// @ID get-products
+// @Accept json
+// @Produce json
+// @Param page query string false "Pagination: page number"
+// @Param pageSize query string false "Pagination: amount of items per page"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /api/products [get]
 func (h *Handler) getAllProducts(c *gin.Context) {
 	var params domain.PaginationParams
 	if err := c.BindQuery(&params); err != nil {
@@ -28,6 +41,18 @@ func (h *Handler) getAllProducts(c *gin.Context) {
 	Response(c, categories)
 }
 
+// @Summary Get Product By Id
+// @Tags Products
+// @Description Get product by id.
+// @ID get-product-by-id
+// @Accept json
+// @Produce json
+// @Param id path int true "Product id"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /api/products/{id} [get]
 func (h *Handler) getProductById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -44,6 +69,26 @@ func (h *Handler) getProductById(c *gin.Context) {
 	Response(c, category)
 }
 
+// @Summary Create Product
+// @Security ApiKeyAuth
+// @Tags Admin
+// @Description Create a new product.
+// @ID create-product
+// @Accept  multipart/form-data
+// @Produce json
+// @Param category_id formData int true "Category id"
+// @Param name formData string true "Product name"
+// @Param description formData string true "Product description"
+// @Param price formData number true "Product actual price"
+// @Param undiscounted_price formData number true "Product price without any discount"
+// @Param stock formData int true "Product stock"
+// @Param available formData boolean true "Product is available"
+// @Param image_file formData file true "Product image"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /admin/products [post]
 func (h *Handler) adminCreateProduct(c *gin.Context) {
 	r := c.Request
 	var input domain.CreateProductInput
@@ -109,6 +154,27 @@ func (h *Handler) adminCreateProduct(c *gin.Context) {
 	OKId(c, id)
 }
 
+// @Summary Update Product
+// @Security ApiKeyAuth
+// @Tags Admin
+// @Description Update product.
+// @ID update-product
+// @Accept  multipart/form-data
+// @Produce json
+// @Param id path int true "Product id"
+// @Param category_id formData int false "Category id"
+// @Param name formData string false "Product name"
+// @Param description formData string false "Product description"
+// @Param price formData number false "Product actual price"
+// @Param undiscounted_price formData number false "Product price without any discount"
+// @Param stock formData int false "Product stock"
+// @Param available formData boolean false "Product is available"
+// @Param image_file formData file false "Product image"
+// @Success 200 {object} response
+// @Failure 400,404 {object} response
+// @Failure 500 {object} response
+// @Failure default {object} response
+// @Router /admin/products/{id} [put]
 func (h *Handler) adminUpdateProduct(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
