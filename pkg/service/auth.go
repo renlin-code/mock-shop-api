@@ -7,7 +7,6 @@ import (
 	"github.com/renlin-code/mock-shop-api/pkg/domain"
 	"github.com/renlin-code/mock-shop-api/pkg/errors_handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
-	"github.com/spf13/viper"
 )
 
 type AuthService struct {
@@ -37,7 +36,7 @@ func (s *AuthService) UserSignUp(name, email string) error {
 	if err != nil {
 		return err
 	}
-	clientUrl := viper.GetString("client.confirmation_email_url")
+	clientUrl := os.Getenv("CLIENT_CONFIRM_EMAIL_PAGE")
 	confirmationLink := fmt.Sprintf("%s?confToken=%s", clientUrl, confirmationToken)
 
 	const emailSubject = "Sign up confirmation"
@@ -121,7 +120,7 @@ func (s *AuthService) RecoveryPassword(email string) error {
 		return err
 	}
 
-	clientUrl := viper.GetString("client.password_recovery_url")
+	clientUrl := os.Getenv("CLIENT_PASSWORD_RECOVERY_PAGE")
 	confirmationLink := fmt.Sprintf("%s?confToken=%s", clientUrl, confirmationToken)
 
 	const emailSubject = "Password recovery confirmation"

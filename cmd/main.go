@@ -8,13 +8,11 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/joho/godotenv"
 	"github.com/renlin-code/mock-shop-api/pkg/handler"
 	"github.com/renlin-code/mock-shop-api/pkg/repository"
 	"github.com/renlin-code/mock-shop-api/pkg/service"
 	"github.com/renlin-code/mock-shop-api/pkg/storage"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 // @title Mock Shop API
@@ -29,27 +27,20 @@ import (
 // @name Authorization
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
-	if err := initConfig(); err != nil {
-		logrus.Fatalf("Error initializating configs: %s", err.Error())
-	}
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("Error loading env variables: %s", err.Error())
-	}
-
 	db, err := repository.NewPostgresDB(repository.Config{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
+		Host:     os.Getenv("POSTGRES_HOST"),
+		Port:     os.Getenv("POSTGRES_PORT"),
+		Username: os.Getenv("POSTGRES_USERNAME"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
+		DBName:   os.Getenv("POSTGRES_NAME"),
+		SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
 	})
 	if err != nil {
 		logrus.Fatalf("Failed to initialize database: %s", err.Error())
 	}
 
 	fsStorage := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: viper.GetString("server.base_url"),
+		BaseUrl: os.Getenv("APP_BASE_URL"),
 	})
 	storage := storage.NewStorage(fsStorage)
 	repos := repository.NewRepository(db, storage)
@@ -59,7 +50,7 @@ func main() {
 	srv := new(handler.Server)
 
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+		if err := srv.Run(os.Getenv("APP_PORT"), handlers.InitRoutes()); err != nil {
 			logrus.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
@@ -78,10 +69,4 @@ func main() {
 		logrus.Errorf("Error occurred on db connection while closing: %s", err.Error())
 	}
 
-}
-
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }

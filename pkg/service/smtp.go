@@ -3,14 +3,12 @@ package service
 import (
 	"net/smtp"
 	"os"
-
-	"github.com/spf13/viper"
 )
 
 func sendMail(to []string, subject, body string) error {
-	smtpServer := viper.GetString("smtp.server")
-	smtpPort := viper.GetString("smtp.port")
-	sender := viper.GetString("smtp.sender")
+	smtpServer := os.Getenv("SMTP_SERVER")
+	smtpPort := os.Getenv("SMTP_PORT")
+	sender := os.Getenv("SMTP_SENDER")
 	password := os.Getenv("SMTP_PASSWORD")
 
 	auth := smtp.PlainAuth("", sender, password, smtpServer)
