@@ -242,3 +242,16 @@ func (h *Handler) adminUpdateCategory(c *gin.Context) {
 
 	OK(c)
 }
+
+func (h *Handler) mediaGetCategoryImage(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
+		return
+	}
+	fileName := c.Param("file-name")
+
+	filePath := h.services.Category.GetFilePath(id, fileName)
+
+	c.File(filePath)
+}

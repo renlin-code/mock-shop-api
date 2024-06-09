@@ -40,7 +40,7 @@ func main() {
 	}
 
 	fsStorage := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: os.Getenv("APP_BASE_URL"),
+		MediaBaseUrl: os.Getenv("APP_MEDIA_BASE_URL"),
 	})
 	storage := storage.NewStorage(fsStorage)
 	repos := repository.NewRepository(db, storage)

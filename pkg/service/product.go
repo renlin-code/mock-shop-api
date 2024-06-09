@@ -32,6 +32,10 @@ func (s *ProductService) GetById(id int) (domain.Product, error) {
 	return product, err
 }
 
+func (s *ProductService) GetFilePath(productId int, fileName string) string {
+	return s.repo.GetFilePath(productId, fileName)
+}
+
 func (s *ProductService) CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error) {
 	id, err := s.repo.CreateProduct(input, file)
 

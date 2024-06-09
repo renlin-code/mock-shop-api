@@ -1,7 +1,7 @@
 package storage
 
 type Config struct {
-	BaseUrl string
+	MediaBaseUrl string
 }
 
 type FileSystemStorage struct {
@@ -11,3 +11,10 @@ type FileSystemStorage struct {
 func NewFileSystemStorage(cfg Config) *FileSystemStorage {
 	return &FileSystemStorage{config: cfg}
 }
+
+const (
+	basePath            = "/data"
+	usersDirectory      = "users"
+	categoriesDirectory = "categories"
+	productsDirectory   = "products"
+)

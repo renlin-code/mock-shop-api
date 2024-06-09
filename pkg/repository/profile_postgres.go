@@ -39,6 +39,10 @@ func (r *ProfilePostgres) GetProfile(userId int) (domain.User, error) {
 	return user, err
 }
 
+func (r *ProfilePostgres) GetFilePath(userId int, fileName string) string {
+	return r.s.Profile.GetFilePath(userId, fileName)
+}
+
 func (r *ProfilePostgres) UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error {
 	tx, err := r.db.Begin()
 	if err != nil {

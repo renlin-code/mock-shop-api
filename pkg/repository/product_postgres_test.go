@@ -23,7 +23,7 @@ func TestGetAllProducts(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -101,7 +101,7 @@ func TestGetProductById(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -175,7 +175,7 @@ func TestCreateProduct(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -286,7 +286,7 @@ func TestUpdateProduct(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 

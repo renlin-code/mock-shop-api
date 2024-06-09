@@ -18,6 +18,7 @@ type Authorization interface {
 type Category interface {
 	GetAll(limit, offset int, search string) ([]domain.Category, error)
 	GetById(id int) (domain.Category, error)
+	GetFilePath(categoryId int, fileName string) string
 	GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error)
 	CreateCategory(input domain.CreateCategoryInput, file multipart.File) (int, error)
 	UpdateCategory(id int, input domain.UpdateCategoryInput, file multipart.File) error
@@ -26,12 +27,14 @@ type Category interface {
 type Product interface {
 	GetAll(limit, offset int, search string) ([]domain.Product, error)
 	GetById(id int) (domain.Product, error)
+	GetFilePath(productId int, fileName string) string
 	CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error)
 	UpdateProduct(id int, input domain.UpdateProductInput, file multipart.File) error
 }
 
 type Profile interface {
 	GetProfile(userId int) (domain.User, error)
+	GetFilePath(userId int, fileName string) string
 	UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error
 	CreateOrder(userId int, products []domain.CreateOrderInputProduct) (int, error)
 	GetAllOrders(userId, limit, offset int) ([]domain.Order, error)

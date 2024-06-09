@@ -22,7 +22,7 @@ func TestGetAllCategories(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -100,7 +100,7 @@ func TestGetCategoryById(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -169,7 +169,7 @@ func TestGetCategoryProducts(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -248,7 +248,7 @@ func TestCreateCategory(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -351,7 +351,7 @@ func TestUpdateCategory(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 

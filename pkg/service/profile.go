@@ -19,6 +19,9 @@ func newProfileService(repo repository.Profile) *ProfileService {
 func (s *ProfileService) GetProfile(userId int) (domain.User, error) {
 	return s.repo.GetProfile(userId)
 }
+func (s *ProfileService) GetFilePath(userId int, fileName string) string {
+	return s.repo.GetFilePath(userId, fileName)
+}
 
 func (s *ProfileService) UpdateProfile(userId int, input domain.UpdateProfileInput, file multipart.File) error {
 	return s.repo.UpdateProfile(userId, input, file)

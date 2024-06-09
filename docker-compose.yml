@@ -5,6 +5,8 @@ services:
       - .env 
     ports:
       - 8020:8020
+    volumes:
+      - ./data:/data
     networks:
       - net
     depends_on:

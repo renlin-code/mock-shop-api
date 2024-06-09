@@ -52,6 +52,10 @@ func (r *CategoryPostgres) GetById(id int) (domain.Category, error) {
 	return category, err
 }
 
+func (r *CategoryPostgres) GetFilePath(categoryId int, fileName string) string {
+	return r.s.Category.GetFilePath(categoryId, fileName)
+}
+
 func (r *CategoryPostgres) GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error) {
 	var products []domain.Product
 

@@ -20,7 +20,7 @@ func TestGetProfile(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -90,7 +90,7 @@ func TestUpdateProfile(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 
@@ -185,7 +185,7 @@ func TestCreateOrder(t *testing.T) {
 	defer db.Close()
 
 	fsTest := storage.NewFileSystemStorage(storage.Config{
-		BaseUrl: "https://test.back.com",
+		MediaBaseUrl: "https://test.back.com",
 	})
 	s := storage.NewStorage(fsTest)
 

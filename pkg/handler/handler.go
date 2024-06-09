@@ -85,5 +85,20 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 	}
 
+	media := router.Group("/media")
+	{
+		users := media.Group("/users")
+		{
+			users.GET("/:id/:file-name", h.mediaGetUserImage)
+		}
+		categories := media.Group("/categories")
+		{
+			categories.GET("/:id/:file-name", h.mediaGetCategoryImage)
+		}
+		products := media.Group("/products")
+		{
+			products.GET("/:id/:file-name", h.mediaGetProductImage)
+		}
+	}
 	return router
 }

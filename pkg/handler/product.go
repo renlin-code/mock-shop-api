@@ -270,3 +270,16 @@ func (h *Handler) adminUpdateProduct(c *gin.Context) {
 
 	OK(c)
 }
+
+func (h *Handler) mediaGetProductImage(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		Fail(c, invalidIdErrorText, http.StatusBadRequest)
+		return
+	}
+	fileName := c.Param("file-name")
+
+	filePath := h.services.Product.GetFilePath(id, fileName)
+
+	c.File(filePath)
+}

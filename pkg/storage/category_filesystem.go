@@ -18,7 +18,7 @@ func newCategoryFileSystem(fs *FileSystemStorage) *CategoryFileSystem {
 }
 
 func (s *CategoryFileSystem) UploadCategoryImage(categoryId int, handler *multipart.FileHeader, file multipart.File) (string, error) {
-	categoryDir := fmt.Sprintf("/data/categories/%d/", categoryId)
+	categoryDir := fmt.Sprintf("%s/%s/%d/", basePath, categoriesDirectory, categoryId)
 
 	err := os.RemoveAll("." + categoryDir)
 	if err != nil {
@@ -39,5 +39,9 @@ func (s *CategoryFileSystem) UploadCategoryImage(categoryId int, handler *multip
 
 	io.Copy(f, file)
 
-	return s.FileSystem.config.BaseUrl + path, nil
+	return fmt.Sprintf("%s/%s/%d/%s", s.FileSystem.config.MediaBaseUrl, categoriesDirectory, categoryId, handler.Filename), nil
+}
+
+func (s *CategoryFileSystem) GetFilePath(categoryId int, fileName string) string {
+	return fmt.Sprintf("%s/%s/%d/%s", basePath, categoriesDirectory, categoryId, fileName)
 }

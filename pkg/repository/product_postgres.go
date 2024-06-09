@@ -52,6 +52,10 @@ func (r *ProductPostgres) GetById(id int) (domain.Product, error) {
 	return product, err
 }
 
+func (r *ProductPostgres) GetFilePath(productId int, fileName string) string {
+	return r.s.Product.GetFilePath(productId, fileName)
+}
+
 func (r *ProductPostgres) CreateProduct(input domain.CreateProductInput, file multipart.File) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {

@@ -18,7 +18,7 @@ func newProductFileSystem(fs *FileSystemStorage) *ProductFileSystem {
 }
 
 func (s *ProductFileSystem) UploadProductImage(productId int, handler *multipart.FileHeader, file multipart.File) (string, error) {
-	productDir := fmt.Sprintf("/data/products/%d/", productId)
+	productDir := fmt.Sprintf("%s/%s/%d/", basePath, productsDirectory, productId)
 
 	err := os.RemoveAll("." + productDir)
 	if err != nil {
@@ -39,5 +39,9 @@ func (s *ProductFileSystem) UploadProductImage(productId int, handler *multipart
 
 	io.Copy(f, file)
 
-	return s.FileSystem.config.BaseUrl + path, nil
+	return fmt.Sprintf("%s/%s/%d/%s", s.FileSystem.config.MediaBaseUrl, productsDirectory, productId, handler.Filename), nil
+}
+
+func (s *ProductFileSystem) GetFilePath(productId int, fileName string) string {
+	return fmt.Sprintf("%s/%s/%d/%s", basePath, productsDirectory, productId, fileName)
 }

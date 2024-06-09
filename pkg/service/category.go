@@ -32,6 +32,10 @@ func (s *CategoryService) GetById(id int) (domain.Category, error) {
 	return category, err
 }
 
+func (s *CategoryService) GetFilePath(categoryId int, fileName string) string {
+	return s.repo.GetFilePath(categoryId, fileName)
+}
+
 func (s *CategoryService) GetProducts(categoryId, limit, offset int, search string) ([]domain.Product, error) {
 	products, err := s.repo.GetProducts(categoryId, limit, offset, search)
 	if errors_handler.ErrorIsType(err, errors_handler.TypeNoRows) {

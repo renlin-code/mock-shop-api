@@ -18,7 +18,7 @@ func newProfileFileSystem(fs *FileSystemStorage) *ProfileFileSystem {
 }
 
 func (s *ProfileFileSystem) UploadProfileImage(userId int, handler *multipart.FileHeader, file multipart.File) (string, error) {
-	userDir := fmt.Sprintf("/data/users/%d/", userId)
+	userDir := fmt.Sprintf("%s/%s/%d/", basePath, usersDirectory, userId)
 
 	err := os.RemoveAll("." + userDir)
 	if err != nil {
@@ -39,5 +39,9 @@ func (s *ProfileFileSystem) UploadProfileImage(userId int, handler *multipart.Fi
 
 	io.Copy(f, file)
 
-	return s.FileSystem.config.BaseUrl + path, nil
+	return fmt.Sprintf("%s/%s/%d/%s", s.FileSystem.config.MediaBaseUrl, usersDirectory, userId, handler.Filename), nil
+}
+
+func (s *ProfileFileSystem) GetFilePath(userId int, fileName string) string {
+	return fmt.Sprintf("%s/%s/%d/%s", basePath, usersDirectory, userId, fileName)
 }
