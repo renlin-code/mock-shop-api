@@ -42,6 +42,16 @@ func (s *ProfileFileSystem) UploadProfileImage(userId int, handler *multipart.Fi
 	return fmt.Sprintf("%s/%s/%d/%s", s.FileSystem.config.MediaBaseUrl, usersDirectory, userId, handler.Filename), nil
 }
 
+func (s *ProfileFileSystem) DeleteProfileImage(userId int) error {
+	userDir := fmt.Sprintf("%s/%s/%d/", basePath, usersDirectory, userId)
+
+	err := os.RemoveAll("." + userDir)
+	if err != nil {
+		return errors_handler.StorageError("error deleting directory")
+	}
+	return err
+}
+
 func (s *ProfileFileSystem) GetFilePath(userId int, fileName string) string {
 	return fmt.Sprintf("%s/%s/%d/%s", basePath, usersDirectory, userId, fileName)
 }

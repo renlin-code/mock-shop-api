@@ -6,6 +6,7 @@ import (
 
 type Profile interface {
 	UploadProfileImage(userId int, handler *multipart.FileHeader, file multipart.File) (string, error)
+	DeleteProfileImage(userId int) error
 	GetFilePath(userId int, fileName string) string
 }
 

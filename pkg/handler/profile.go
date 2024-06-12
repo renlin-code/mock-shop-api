@@ -72,7 +72,6 @@ func (h *Handler) updateUserProfile(c *gin.Context) {
 		defer file.Close()
 	}
 
-	input.Name = &name
 	input.ProfileImgFile = handler
 
 	if err := input.Validate(); err != nil {
