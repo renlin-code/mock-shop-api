@@ -1,7 +1,7 @@
 # Mock Shop API
 
 
-Mock Shop API is an API service for a fake online shop. It allows you to create a catalog for products and product categories. It also has authorization for customers where they can place orders and view their purchase history.
+Mock Shop API is an API service for a fake online shop. It allows you to create a catalog for products and categories. It also has authorization for customers where they can place orders and view their purchase history.
 
 ![project banner](https://imgur.com/Hp4xbzI.png)
 
@@ -20,4 +20,4 @@ docker-compose up
 
 ## Documentation
 
-After building and running the app you can find the Documentation at the address "/swagger/index.html"
+After building and running the app you can find the documentation at the address "/swagger/index.html"
