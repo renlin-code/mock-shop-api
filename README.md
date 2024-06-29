@@ -2,7 +2,8 @@
 
 
 Mock Shop API is an API service for a fake online shop. It allows you to create a catalog for products and product categories. It also has authorization for customers where they can place orders and view their purchase history.
-![Texto alternativo](https://imgur.com/JaTTmzG.png)
+
+![project banner](https://imgur.com/Hp4xbzI.png)
 
 ## Building and running the App
 
